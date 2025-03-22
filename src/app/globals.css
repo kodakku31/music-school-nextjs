@@ -1,26 +1,2238 @@
-@import "tailwindcss";
+/* Tailwindディレクティブ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* ベース設定 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-gray: #F5F5F5;
+  --color-light-gray: #E0E0E0;
+  --font-serif: var(--font-noto-serif);
+  --font-sans: var(--font-noto-sans);
+  --left-panel-width: 40%;
+  --nav-panel-width: 14%;
+  --content-padding: 20px;
+  --border-color: var(--color-black);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  color: var(--color-black);
+  line-height: 1.7;
+  background-color: var(--color-white);
+  overflow-x: hidden;
+  letter-spacing: 0.02em;
+  height: 100%;
+  padding: var(--content-padding);
+}
+
+.wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  border: 1px solid var(--border-color);
+}
+
+a {
+  color: var(--color-black);
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+a:hover {
+  opacity: 0.7;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+h2 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+p {
+  margin-bottom: 1.5rem;
+  font-weight: 300;
+}
+
+/* 左側パネル（画像エリア） */
+.left-panel {
+  width: var(--left-panel-width);
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--border-color);
+}
+
+.image-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.image-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  background-color: #f5f5f5;
+}
+
+.image-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.image-slide.active {
+  opacity: 1;
+}
+
+/* 右端パネル（ナビゲーションエリア） */
+.nav-panel {
+  width: var(--nav-panel-width);
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--color-white);
+  z-index: 100;
+  border-left: 1px solid var(--border-color);
+}
+
+/* 右中央パネル（メインコンテンツエリア） */
+.main-panel {
+  width: calc(100% - var(--left-panel-width) - var(--nav-panel-width));
+  height: 100%;
+  margin-left: var(--left-panel-width);
+  overflow-y: auto;
+}
+
+/* ファーストビュー */
+.first-view {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* メインロゴ */
+.main-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.logo-mark {
+  width: 150px;
+  height: 100px;
+  margin-bottom: 2rem;
+}
+
+.logo-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.logo-title {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+}
+
+/* ロゴ */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.logo-text {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+/* ナビゲーション */
+.main-nav {
+  flex-grow: 1;
+}
+
+.main-nav ul {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.main-nav li {
+  margin-bottom: 1rem;
+}
+
+.main-nav a {
+  font-size: 0.8rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+/* ログインボタン */
+.login-container {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  width: 100%;
+}
+
+.login-button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: var(--color-light-gray);
+  font-size: 0.8rem;
+  font-weight: 300;
+  width: 100%;
+  text-align: center;
+  border-radius: 3px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  opacity: 1;
+}
+
+/* SNSリンク */
+.social-links {
+  text-align: center;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.social-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-light-gray);
+  transition: background-color 0.3s ease;
+}
+
+.social-link:hover {
+  background-color: #f0f0f0;
+  opacity: 1;
+}
+
+.social-link svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--color-black);
+  transition: fill 0.3s ease;
+}
+
+/* スクロールインジケーター */
+.scroll-indicator {
+  text-align: center;
+  margin-top: 2rem;
+  cursor: pointer;
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.scroll-indicator span {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  font-weight: 300;
+}
+
+.scroll-arrow {
+  font-size: 0.8rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* コンテンツセクション */
+.content-sections {
+  width: 100%;
+  padding: 2rem;
+}
+
+.content-section {
+  padding: 3rem 2rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 4rem;
+}
+
+.content-section:last-child {
+  border-bottom: none;
+}
+
+.content-section:nth-child(odd) {
+  background-color: var(--color-white);
+}
+
+.content-section:nth-child(even) {
+  background-color: var(--color-gray);
+}
+
+.section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.content-section h2 {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+/* ストーリーセクション */
+.story-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.story-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ニュースセクション */
+.news-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.news-item {
+  border: 1px solid var(--color-light-gray);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.news-item:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.news-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.news-content {
+  padding: 1.5rem;
+}
+
+.news-date {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.news-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.news-excerpt {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.more-link {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--color-black);
+  padding-bottom: 2px;
+}
+
+/* レッスンセクション */
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.lesson-item {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  border-bottom: 1px solid var(--color-light-gray);
+  padding-bottom: 2rem;
+}
+
+.lesson-image {
+  overflow: hidden;
+}
+
+.lesson-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lesson-title {
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.lesson-description {
+  font-size: 0.95rem;
+}
+
+.lesson-features {
+  margin-top: 1rem;
+}
+
+.lesson-features h4 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.lesson-features ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.lesson-price {
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.lesson-info {
+  background-color: var(--color-gray);
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.lesson-info h3 {
+  margin-bottom: 1.5rem;
+}
+
+.lesson-info ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+/* 講師セクション */
+.teacher-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.teacher-item {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  border-bottom: 1px solid var(--color-light-gray);
+  padding-bottom: 2rem;
+}
+
+.teacher-image {
+  overflow: hidden;
+}
+
+.teacher-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.teacher-name {
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.teacher-role {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.teacher-profile {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.teacher-details {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 1rem;
+}
+
+.teacher-message {
+  background-color: var(--color-gray);
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.teacher-message h4 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.teacher-more {
+  margin-top: 1.5rem;
+}
+
+/* アクセスセクション */
+.access-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.access-info {
+  padding-right: 2rem;
+}
+
+.info-block {
+  margin-top: 1.5rem;
+}
+
+.info-block dl {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem 2rem;
+}
+
+.info-block dt {
+  font-weight: 500;
+}
+
+.info-block dd {
+  margin-bottom: 1rem;
+}
+
+.map-container {
+  height: 300px;
+  background-color: var(--color-gray);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.map-placeholder {
+  text-align: center;
+}
+
+.map-placeholder .note {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.access-directions {
+  margin-bottom: 3rem;
+}
+
+.directions-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.direction-item h4 {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.access-gallery {
+  margin-top: 3rem;
+}
+
+.gallery-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.gallery-item {
+  text-align: center;
+}
+
+.gallery-image {
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.gallery-image img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+.gallery-image img:hover {
+  transform: scale(1.05);
+}
+
+.caption {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* コンタクトセクション */
+.contact-intro {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.required-note {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 1rem;
+}
+
+.required-mark {
+  color: #e53e3e;
+}
+
+.contact-form-container {
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  background-color: var(--color-white);
+  padding: 2rem;
+  border: 1px solid var(--color-light-gray);
+}
+
+.contact-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.contact-info-item {
+  background-color: var(--color-gray);
+  padding: 1.5rem;
+}
+
+.contact-description {
+  margin-bottom: 1rem;
+}
+
+.contact-tel, .contact-email {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.contact-hours {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.faq-section {
+  margin-top: 3rem;
+}
+
+.faq-list {
+  margin-top: 1.5rem;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--color-light-gray);
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.faq-item h4 {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.faq-answer {
+  font-size: 0.95rem;
+}
+
+/* ブログセクション */
+.blog-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.blog-container-full {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.blog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.blog-item {
+  border-bottom: 1px solid var(--color-light-gray);
+  padding-bottom: 2rem;
+}
+
+.blog-item-inner {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+}
+
+.blog-image {
+  overflow: hidden;
+}
+
+.blog-image img {
+  transition: transform 0.3s ease;
+}
+
+.blog-image img:hover {
+  transform: scale(1.05);
+}
+
+.blog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.blog-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.blog-category {
+  padding: 2px 8px;
+  background-color: var(--color-gray);
+}
+
+.blog-title {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 0.5rem 0;
+}
+
+.blog-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.blog-title a:hover {
+  color: var(--color-accent);
+}
+
+.blog-excerpt {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.blog-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.blog-author {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.blog-more {
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--color-black);
+  padding-bottom: 2px;
+  transition: border-color 0.3s ease;
+}
+
+.blog-more:hover {
+  border-color: var(--color-accent);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  gap: 1rem;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.page-number, .page-prev, .page-next {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-light-gray);
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+}
+
+.page-number:hover, .page-prev:hover, .page-next:hover {
+  background-color: var(--color-gray);
+}
+
+.page-number.current {
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+/* ブログページ特有のスタイル */
+.blog-page .content-section {
+  min-height: auto;
+  padding-top: 2rem;
+}
+
+.blog-page .section-inner {
+  max-width: 1200px;
+}
+
+/* レスポンシブ対応 - ブログ */
+@media (max-width: 768px) {
+  .blog-item-inner {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .blog-image {
+    margin-bottom: 1rem;
+  }
+}
+
+/* ニュースページ（新デザイン） */
+.news-page-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 左側の大きな画像エリア */
+.news-hero-image {
+  width: 60%;
+  height: 100%;
+  position: relative;
+  background-color: #f0f0f0;
+}
+
+.news-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.news-hero-title {
+  font-family: var(--font-serif);
+  font-size: 5rem;
+  font-weight: 400;
+  color: var(--color-white);
+  letter-spacing: 0.1em;
+}
+
+/* 右側のニュース一覧エリア */
+.news-list-container {
+  width: 40%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 3rem 2rem;
+  background-color: var(--color-white);
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.news-item {
+  padding: 1.5rem 0;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.news-item:hover {
+  opacity: 0.7;
+}
+
+.news-date {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.news-title {
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+
+.news-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+}
+
+/* シンプルなニュースリスト */
+.simple-news-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.simple-news-item {
+  display: block;
+  padding: 1.5rem 0;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.3s ease;
+}
+
+.simple-news-item:hover {
+  opacity: 0.7;
+}
+
+.simple-news-date {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.simple-news-title {
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.simple-news-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin-bottom: 0.5rem;
+}
+
+/* ニュースページ特有のスタイル */
+.news-page .content-section {
+  min-height: auto;
+  padding-top: 2rem;
+}
+
+.news-page .section-inner {
+  max-width: 800px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .news-page-container {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .news-hero-image {
+    width: 100%;
+    height: 40vh;
+  }
+  
+  .news-list-container {
+    width: 100%;
+    height: auto;
+  }
+  
+  .news-hero-title {
+    font-size: 3rem;
+  }
+}
+
+/* フッター */
+.footer {
+  padding: 3rem 2rem;
+  background-color: #f8f8f8;
+  text-align: center;
+  border-top: 1px solid #eaeaea;
+}
+
+.footer-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.footer-content {
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #555;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-content span {
+  margin: 0 0.5rem;
+}
+
+.footer-content a {
+  color: #555;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-content a:hover {
+  color: #000;
+}
+
+.copyright {
+  font-size: 0.75rem;
+  font-weight: 300;
+  color: #888;
+}
+
+/* レスポンシブ設定 */
+@media (max-width: 1024px) {
+  .wrapper {
+    flex-direction: column;
+  }
+  
+  .left-panel {
+    position: relative;
+    width: 100%;
+    height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .nav-panel {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+    padding: 1rem;
+  }
+  
+  .main-panel {
+    width: 100%;
+    margin-left: 0;
+    height: auto;
+  }
+  
+  .main-nav ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .main-nav li {
+    margin: 0 1rem 1rem;
+  }
+  
+  .login-container {
+    width: 50%;
+    margin: 0 auto 1.5rem;
+  }
+  
+  .content-sections {
+    padding: 1rem;
+  }
+  
+  .lesson-item, .teacher-item, .blog-item-inner {
+    grid-template-columns: 1fr;
+  }
+  
+  .access-content, .contact-info, .blog-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .news-list, .gallery-items {
+    grid-template-columns: 1fr;
+  }
+  
+  .info-block dl {
+    grid-template-columns: 1fr;
+  }
+  
+  .info-block dt {
+    margin-bottom: 0.3rem;
+  }
+  
+  .info-block dd {
+    margin-bottom: 1.5rem;
+  }
+  
+  .login-container {
+    width: 80%;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-nav ul {
+    flex-direction: column;
+  }
+  
+  .main-nav li {
+    margin: 0 0 1rem;
+  }
+  
+  .login-container {
+    width: 100%;
+  }
+}
+
+/* レッスンページ用の新しいCSSスタイル */
+.lesson-page .content-section {
+  padding: 4rem 0;
+}
+
+.lesson-page .section-title {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.lesson-page .section-title:after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 2px;
+  background-color: var(--color-accent);
+  margin: 1rem auto 0;
+}
+
+.lesson-intro {
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  text-align: center;
+  line-height: 1.8;
+}
+
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  margin-bottom: 3rem;
+}
+
+.lesson-item {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  border-bottom: 1px solid var(--color-light-gray);
+  padding-bottom: 3rem;
+}
+
+.lesson-image {
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.lesson-image img {
+  transition: transform 0.5s ease;
+}
+
+.lesson-image:hover img {
+  transform: scale(1.05);
+}
+
+.lesson-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lesson-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.lesson-title:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background-color: var(--color-accent);
+}
+
+.lesson-description {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.lesson-features h4,
+.lesson-plans h4,
+.lesson-schedule h4,
+.lesson-teachers h4 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.lesson-features ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.lesson-features li {
+  margin-bottom: 0.5rem;
+}
+
+.plan-cards {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.plan-card {
+  flex: 1;
+  min-width: 180px;
+  border: 1px solid var(--color-light-gray);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #fff;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-accent);
+}
+
+.plan-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-light-gray);
+}
+
+.plan-details {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.plan-frequency, .plan-duration {
+  margin-bottom: 0.5rem;
+}
+
+.plan-price {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: auto;
+  color: var(--color-accent);
+}
+
+.lesson-schedule, .lesson-teachers {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.lesson-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: #fff;
+  border: 1px solid var(--color-accent);
+}
+
+.btn-primary:hover {
+  background-color: #fff;
+  color: var(--color-accent);
+}
+
+.btn-secondary {
+  background-color: #fff;
+  color: var(--color-black);
+  border: 1px solid var(--color-black);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-black);
+  color: #fff;
+}
+
+.lesson-info {
+  background-color: var(--color-gray);
+  padding: 3rem;
+  border-radius: 8px;
+}
+
+.lesson-info h4 {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.lesson-flow {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 3rem;
+}
+
+.lesson-flow li {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.lesson-flow li:not(:last-child):after {
+  content: '';
+  position: absolute;
+  top: 40px;
+  left: 20px;
+  width: 2px;
+  height: calc(100% + 2rem);
+  background-color: var(--color-light-gray);
+}
+
+.flow-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-accent);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 600;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.flow-content {
+  flex: 1;
+}
+
+.flow-content h5 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.lesson-notes {
+  list-style: disc;
+  padding-left: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.lesson-notes li {
+  margin-bottom: 0.8rem;
+}
+
+.trial-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.trial-form-intro {
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.trial-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.required-mark {
+  color: #e53e3e;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.8rem;
+  border: 1px solid var(--color-light-gray);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.form-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* レスポンシブ対応 - レッスンページ */
+@media (max-width: 768px) {
+  .lesson-item {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .plan-cards {
+    flex-direction: column;
+  }
+  
+  .plan-card {
+    min-width: 100%;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .lesson-info {
+    padding: 1.5rem;
+  }
+  
+  .lesson-actions {
+    flex-direction: column;
+  }
+}
+
+/* 講師紹介ページ */
+.teacher-page {
+  padding-bottom: 5rem;
+}
+
+.teacher-intro {
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  text-align: center;
+  line-height: 1.8;
+}
+
+.teacher-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.teacher-item {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2.5rem;
+  position: relative;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--color-light-gray);
+}
+
+.teacher-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.teacher-quick-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  color: white;
+  padding: 2rem 1rem 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.teacher-image:hover .teacher-quick-info {
+  opacity: 1;
+}
+
+.teacher-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.teacher-header {
+  margin-bottom: 0.5rem;
+}
+
+.teacher-name {
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+}
+
+.teacher-role {
+  font-size: 1rem;
+  color: #666;
+}
+
+.teacher-profile {
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.teacher-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.detail-item {
+  margin-bottom: 1rem;
+}
+
+.detail-item h4 {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.detail-item ul {
+  list-style: disc;
+  padding-left: 1.2rem;
+}
+
+.detail-item li {
+  margin-bottom: 0.3rem;
+}
+
+.course-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.course-tag {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  background-color: var(--color-light-gray);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  transition: background-color 0.3s ease;
+}
+
+.course-tag:hover {
+  background-color: var(--color-gray);
+}
+
+.teacher-skills {
+  margin-top: 1rem;
+}
+
+.teacher-skills h4 {
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.skill-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.skill-bar {
+  display: grid;
+  grid-template-columns: 100px 1fr 40px;
+  align-items: center;
+  gap: 1rem;
+}
+
+.skill-name {
+  font-size: 0.9rem;
+}
+
+.skill-level {
+  height: 8px;
+  background-color: var(--color-light-gray);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.skill-fill {
+  height: 100%;
+  background-color: var(--color-accent);
+  border-radius: 4px;
+}
+
+.skill-percent {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.teacher-message {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.teacher-message h4 {
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+}
+
+.teacher-message p {
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.teacher-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+.btn-primary:hover {
+  background-color: #333;
+}
+
+.btn-secondary {
+  background-color: var(--color-white);
+  color: var(--color-black);
+  border: 1px solid var(--color-black);
+}
+
+.btn-secondary:hover {
+  background-color: #f0f0f0;
+}
+
+/* 講師詳細ページ */
+.teacher-detail-page {
+  padding: 3rem 0 5rem;
+}
+
+.teacher-detail-page .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 2rem;
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: var(--color-black);
+}
+
+.teacher-hero {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+
+.teacher-main-image {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.main-image {
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.teacher-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.teacher-intro .teacher-name {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.teacher-intro .teacher-role {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.teacher-quick-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.info-item h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.teacher-content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 3rem;
+}
+
+.teacher-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.teacher-main-content section {
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--color-light-gray);
+}
+
+.teacher-main-content h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.bio-text {
+  line-height: 1.8;
+}
+
+.education-list,
+.awards-list,
+.performances-list {
+  list-style: disc;
+  padding-left: 1.5rem;
+  line-height: 1.6;
+}
+
+.education-list li,
+.awards-list li,
+.performances-list li {
+  margin-bottom: 0.8rem;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.gallery-item {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.gallery-item:hover {
+  transform: translateY(-5px);
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.testimonial-item {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.testimonial-text {
+  font-style: italic;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.testimonial-author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.author-name {
+  font-weight: 500;
+}
+
+.author-info {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.teacher-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.teacher-sidebar section {
+  background-color: #f9f9f9;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.teacher-sidebar h2 {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.course-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.course-item {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.course-item:last-child {
+  border-bottom: none;
+}
+
+.course-item h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.course-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--color-accent);
+  transition: color 0.3s ease;
+}
+
+.course-link:hover {
+  color: var(--color-black);
+}
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* レスポンシブ対応 - 講師紹介ページ */
+@media (max-width: 992px) {
+  .teacher-item {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .teacher-image {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .teacher-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .teacher-hero {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .teacher-main-image {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .teacher-content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .teacher-sidebar {
+    margin-top: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .teacher-actions {
+    flex-direction: column;
+  }
+  
+  .teacher-intro .teacher-name {
+    font-size: 2rem;
+  }
+}
+
+/* 認証ページのスタイル */
+.auth-page {
+  padding: 2rem 0;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+}
+
+.auth-content {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--color-white);
+  border: 1px solid var(--border-color);
+}
+
+.auth-description {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.auth-form-container {
+  width: 100%;
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--color-light-gray);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.auth-tab.active {
+  border-bottom: 2px solid var(--color-black);
+  font-weight: 700;
+}
+
+.auth-form {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-light-gray);
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--color-black);
+}
+
+.error-text {
+  color: #e53e3e;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.error-message {
+  background-color: #fff5f5;
+  color: #e53e3e;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #fed7d7;
+}
+
+.success-message {
+  background-color: #f0fff4;
+  color: #38a169;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #c6f6d5;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--color-black);
+  color: var(--color-white);
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+  opacity: 0.9;
+}
+
+.submit-button:disabled {
+  background-color: var(--color-light-gray);
+  cursor: not-allowed;
+}
+
+.auth-links {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.auth-links a {
+  color: var(--color-black);
+  text-decoration: underline;
+  font-size: 0.875rem;
+}
+
+/* ユーザーメニュー */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.logout-button {
+  background: none;
+  border: 1px solid var(--color-black);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+/* ローディングスピナー */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--color-black);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

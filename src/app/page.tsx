@@ -1,103 +1,43 @@
-import Image from "next/image";
+import MainLayout from "@/components/layout/MainLayout";
+import ScrollIndicator from "@/components/home/ScrollIndicator";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <MainLayout>
+      {/* ファーストビューのロゴセクション */}
+      <div className="first-view">
+        <div className="main-logo">
+          <div className="logo-mark">
+            <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20,40 C30,10 40,50 60,20 C80,50 90,10 100,40" stroke="black" strokeWidth="1.5" fill="none" />
+            </svg>
+          </div>
+          <h1 className="logo-title">MUSIC SCHOOL</h1>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        {/* スクロールインジケーター */}
+        <ScrollIndicator />
+      </div>
+
+      <div className="content-sections">
+        {/* ストーリーセクション */}
+        <section id="story" className="content-section">
+          <div className="section-inner">
+            <h2>STORY</h2>
+            <p>
+              当音楽教室は、2005年に創業者の山田太郎によって設立されました。山田は若い頃からクラシック音楽に情熱を持ち、東京音楽大学を卒業後、ヨーロッパで10年間研鑽を積みました。帰国後、日本の音楽教育に新しい風を吹き込むべく、この教室を開設しました。
+            </p>
+            <p>
+              私たちは、「音楽を通じて人生を豊かに」という理念のもと、初心者から上級者まで、年齢を問わず、一人ひとりの目標や個性に合わせたレッスンを提供しています。技術だけでなく、音楽の楽しさや感動を伝えることを大切にしています。
+            </p>
+            <p>
+              教室は、最新の設備を整えた防音スタジオを完備し、グランドピアノやアップライトピアノ、電子ピアノ、ドラムセット、ギターアンプなど、様々な楽器を用意しています。また、録音設備も整っており、生徒さんの演奏を録音して上達の過程を確認することもできます。
+            </p>
+            <p>
+              講師陣は、国内外の音楽大学を卒業した一流の演奏家や教育者で構成されており、それぞれの専門分野で高い技術と豊かな経験を持っています。生徒一人ひとりの個性や目標に合わせた指導を心がけ、音楽の技術だけでなく、音楽を愛する心も育てています。
+            </p>
+          </div>
+        </section>
+      </div>
+    </MainLayout>
   );
 }
