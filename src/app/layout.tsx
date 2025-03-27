@@ -27,6 +27,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossOrigin="anonymous"></script>
+      </head>
       <body
         className={`${notoSans.variable} ${notoSerif.variable} antialiased`}
       >
