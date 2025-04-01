@@ -5,39 +5,49 @@ import { Providers } from './providers';
 
 const notoSans = Noto_Sans_JP({
   variable: "--font-noto-sans",
+  weight: ['300', '400', '500', '700'],
   subsets: ["latin"],
-  weight: ['300', '400', '500'],
 });
 
 const notoSerif = Noto_Serif_JP({
   variable: "--font-noto-serif",
-  subsets: ["latin"],
   weight: ['300', '400', '500'],
 });
 
 export const metadata: Metadata = {
   title: "音楽教室 | Music School",
   description: "音楽を愛する全ての人のための音楽教室",
-  manifest: "/manifest.json",
-  themeColor: "#000000",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "音楽教室",
-  },
   viewport: {
     width: "device-width",
     initialScale: 1,
     maximumScale: 1,
-    userScalable: false,
+  },
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#222222" },
+  ],
+  icons: {
+    icon: [
+      {
+        url: "/favicon.ico",
+        sizes: "any",
+      },
+    ],
+    apple: [
+      {
+        url: "/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
   },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="ja">
       <head>

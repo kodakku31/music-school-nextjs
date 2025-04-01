@@ -173,9 +173,17 @@
 .userMenu {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   width: 100%;
   align-items: center;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .userName {
@@ -183,6 +191,63 @@
   font-weight: 600;
   text-align: center;
   letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.userStatus {
+  color: #4CAF50;
+  font-size: 0.5rem;
+  animation: pulse 2s infinite;
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.userActions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* マイページボタン */
+.mypageButton {
+  align-items: center;
+  background-color: #6a64f1;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  font-size: 1.1rem;
+  font-weight: 500;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 1rem 1.75rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
+  letter-spacing: 0.05em;
+}
+
+.mypageButton:hover {
+  background-color: #5a54e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(106, 100, 241, 0.2);
 }
 
 /* ログアウトボタン */

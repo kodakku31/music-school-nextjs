@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import AuthModal from '../auth/AuthModal';
 import MobileMenu from './MobileMenu';
+
+// 認証チェックの間隔（30秒）
+const AUTH_CHECK_INTERVAL = 30000;
+// セッションの有効期限（1時間）
+const SESSION_EXPIRY = 3600000;
 
 export default function Header() {
   const pathname = usePathname();
@@ -17,130 +21,126 @@ export default function Header() {
   const [loading, setLoading] = useState(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const lastAuthCheckRef = useRef<number>(0);
-  const AUTH_CHECK_INTERVAL = 30000; // 30秒間隔で認証チェックを制限
-
-  // デバッグ用：現在のパスを確認
-  useEffect(() => {
-    console.log('現在のパス:', pathname);
-  }, [pathname]);
+  
+  // セッションストレージからユーザー情報を取得
+  const getSessionUser = useCallback(() => {
+    try {
+      const now = Date.now();
+      const storedSession = sessionStorage.getItem('userSession');
+      
+      if (!storedSession) return null;
+      
+      const parsedSession = JSON.parse(storedSession);
+      // 有効期限内のセッション情報のみ使用
+      const isValid = (now - parsedSession.timestamp) < SESSION_EXPIRY;
+      
+      if (!isValid) {
+        sessionStorage.removeItem('userSession');
+        return null;
+      }
+      
+      // 型安全のために必要な最小限のプロパティを持つオブジェクトを返す
+      return {
+        id: parsedSession.id,
+        email: parsedSession.email,
+        app_metadata: {},
+        aud: '',
+        created_at: '',
+        confirmed_at: '',
+        last_sign_in_at: '',
+        role: '',
+        updated_at: '',
+        user_metadata: {
+          name: parsedSession.email.split('@')[0]
+        }
+      } as unknown as Session['user']; // 明示的に unknown を経由して型変換
+    } catch (e) {
+      console.error('[認証] セッションストレージ読み込みエラー:', e);
+      return null;
+    }
+  }, []);
 
   // ユーザー情報の取得
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        // 前回の認証チェックからの経過時間を確認
-        const now = Date.now();
-        const timeSinceLastCheck = now - lastAuthCheckRef.current;
-        
-        // セッションストレージからユーザー情報を確認（常に実行）
-        let sessionUser = null;
-        try {
-          const storedSession = sessionStorage.getItem('userSession');
-          if (storedSession) {
-            const parsedSession = JSON.parse(storedSession);
-            // 1時間以内に保存されたセッション情報のみ有効とする
-            const isValid = (now - parsedSession.timestamp) < 3600000;
-            if (isValid) {
-              console.log('[認証] セッションストレージからユーザー情報を復元:', parsedSession.email);
-              sessionUser = parsedSession;
-              
-              // セッションストレージに有効な情報がある場合は、一時的にユーザー状態を設定
-              if (!user) {
-                setUser({
-                  id: parsedSession.id,
-                  email: parsedSession.email,
-                  user_metadata: {
-                    name: parsedSession.email.split('@')[0]
-                  }
-                } as any);
-              }
-            } else {
-              // 期限切れの場合は削除
-              sessionStorage.removeItem('userSession');
-            }
-          }
-        } catch (e) {
-          console.error('[認証] セッションストレージ読み込みエラー:', e);
-        }
-        
-        // 前回のチェックから十分な時間が経過していない場合はAPIリクエストをスキップ
-        if (timeSinceLastCheck < AUTH_CHECK_INTERVAL && (user || sessionUser)) {
-          console.log(`[認証] 前回のチェックから${Math.floor(timeSinceLastCheck/1000)}秒しか経過していないため、APIリクエストをスキップします`);
-          setLoading(false);
-          return;
-        }
-        
-        // 時間が経過しているか、ユーザー情報がない場合はAPIリクエスト
-        lastAuthCheckRef.current = now;
-        setLoading(true);
-
-        // 直接クライアントを作成して最新の認証状態を取得
-        const supabaseClient = createClientComponentClient();
-        const { data, error } = await supabaseClient.auth.getSession();
-
-        if (error) {
-          console.error('[認証] セッション取得エラー:', error);
-          setLoading(false);
-          return;
-        }
-
-        // Supabaseセッションがある場合はそれを優先
-        if (data.session?.user) {
-          console.log('[認証] Supabaseセッション検出:', data.session.user.email);
-          setUser(data.session.user);
-          
-          // 最新のセッション情報をストレージに保存
-          sessionStorage.setItem('userSession', JSON.stringify({
-            isLoggedIn: true,
-            email: data.session.user.email,
-            id: data.session.user.id,
-            timestamp: now
-          }));
-        } 
-        // セッションストレージに情報があり、Supabaseセッションがない場合
-        else if (sessionUser && !data.session?.user) {
-          console.log('[認証] セッションストレージからユーザー情報を使用');
-          // セッションストレージの情報を使用してユーザー状態を設定
-          // 注: これは表示目的のみで、実際の認証には使用しない
-          setUser({
-            id: sessionUser.id,
-            email: sessionUser.email,
-            user_metadata: {
-              name: sessionUser.email.split('@')[0]
-            }
-          } as any);
-        } else {
-          console.log('[認証] 現在のセッション:', data.session?.user?.email || 'ログインなし');
-          setUser(data.session?.user || null);
-        }
-
-        // 認証状態の変更を監視
-        const { data: authListener } = supabaseClient.auth.onAuthStateChange(
-          (event: AuthChangeEvent, session: Session | null) => {
-            console.log('[認証] 認証状態変更:', event, session?.user?.email);
-            setUser(session?.user || null);
-
-            // 状態変更時にページをリフレッシュ
-            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-              router.refresh();
-            }
-          }
-        );
-
-        return () => {
-          if (authListener?.subscription) {
-            authListener.subscription.unsubscribe();
-          }
-        };
-      } catch (error) {
-        console.error('[認証] 認証状態チェックエラー:', error);
-      } finally {
-        setLoading(false);
+  const checkUser = useCallback(async () => {
+    try {
+      // 前回の認証チェックからの経過時間を確認
+      const now = Date.now();
+      const timeSinceLastCheck = now - lastAuthCheckRef.current;
+      
+      // セッションストレージからユーザー情報を確認
+      const sessionUser = getSessionUser();
+      if (sessionUser && !user) {
+        setUser(sessionUser);
       }
-    };
+      
+      // 前回のチェックから十分な時間が経過していない場合はAPIリクエストをスキップ
+      if (timeSinceLastCheck < AUTH_CHECK_INTERVAL && (user || sessionUser)) {
+        setLoading(false);
+        return;
+      }
+      
+      // 時間が経過しているか、ユーザー情報がない場合はAPIリクエスト
+      lastAuthCheckRef.current = now;
+      setLoading(true);
 
+      // 直接クライアントを作成して最新の認証状態を取得
+      const supabaseClient = createClientComponentClient();
+      const { data, error } = await supabaseClient.auth.getSession();
+
+      if (error) {
+        console.error('[認証] セッション取得エラー:', error);
+        setLoading(false);
+        return;
+      }
+
+      // Supabaseセッションがある場合はそれを優先
+      if (data.session?.user) {
+        setUser(data.session.user);
+        
+        // 最新のセッション情報をストレージに保存
+        sessionStorage.setItem('userSession', JSON.stringify({
+          isLoggedIn: true,
+          email: data.session.user.email,
+          id: data.session.user.id,
+          timestamp: now
+        }));
+      } 
+      // セッションストレージに情報があり、Supabaseセッションがない場合
+      else if (sessionUser && !data.session?.user) {
+        // セッションストレージの情報を使用してユーザー状態を設定
+        setUser(sessionUser);
+      } else {
+        setUser(null);
+      }
+
+      // 認証状態の変更を監視
+      const { data: authListener } = supabaseClient.auth.onAuthStateChange(
+        (event: AuthChangeEvent, session: Session | null) => {
+          setUser(session?.user || null);
+
+          // 状態変更時にページをリフレッシュ
+          if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+            router.refresh();
+          }
+        }
+      );
+
+      return () => {
+        if (authListener?.subscription) {
+          authListener.subscription.unsubscribe();
+        }
+      };
+    } catch (error) {
+      console.error('[認証] 認証状態チェックエラー:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user, router, getSessionUser]);
+
+  // 初期化時にユーザー情報を取得
+  useEffect(() => {
     checkUser();
-  }, [router]);
+  }, [checkUser]);
 
   // ログアウト処理
   const handleLogout = async () => {
@@ -154,7 +154,9 @@ export default function Header() {
         return;
       }
 
-      console.log('[認証] ログアウト成功');
+      // セッションストレージのクリア
+      sessionStorage.removeItem('userSession');
+      
       setUser(null);
 
       // ページをリフレッシュしてから、完全なリロードを行う
