@@ -1,91 +1,109 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/types/database.types';
 
-// Supabase環境変数
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-// デバッグ用に環境変数の状態をコンソールに出力
-console.log('Supabase URL:', supabaseUrl ? 'Set (not empty)' : 'Not set (empty)');
-console.log('Supabase Anon Key:', supabaseAnonKey ? 'Set (not empty)' : 'Not set (empty)');
-
-// デモモードかどうかを確認
-const isDemoMode = !supabaseUrl || !supabaseAnonKey;
-console.log('Demo Mode:', isDemoMode);
-
-// Supabaseクライアントの作成（デモモード対応）
-export const supabase = isDemoMode 
-  ? {
-      auth: {
-        getSession: async () => ({ data: { session: null } }),
-        signInWithPassword: async () => ({ error: { message: 'デモモードではログインできません。環境変数を設定してください。' } }),
-        signUp: async () => ({ error: { message: 'デモモードでは会員登録できません。環境変数を設定してください。' } }),
-        signOut: async () => ({ error: null }),
-        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-      },
-    } as any
-  : createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-      },
-      global: {
-        // CORSエラーを回避するための設定
-        fetch: (url, options = {}) => {
-          const headers = new Headers(options.headers || {});
-          headers.set('X-Client-Info', 'music-school-nextjs');
-          
-          return fetch(url, {
-            ...options,
-            headers,
-            mode: 'cors',
-            credentials: 'include',
-          });
-        },
-      },
-    });
-
-// サーバーサイドでのみ使用するSupabaseクライアント
-export const createServerSupabaseClient = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+// 環境変数の検証とログ出力関数
+function validateAndLogEnvironment() {
+  // 環境変数を取得
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   
-  console.log('Server Supabase URL:', supabaseUrl ? 'Set (not empty)' : 'Not set (empty)');
-  console.log('Server Supabase Service Key:', supabaseServiceKey ? 'Set (not empty)' : 'Not set (empty)');
+  // 環境変数の存在チェック
+  const isClient = typeof window !== 'undefined';
+  const environment = isClient ? 'クライアント' : 'サーバー';
   
-  // デモモードの場合
-  if (!supabaseUrl || !supabaseServiceKey) {
-    console.log('Supabase環境変数が設定されていません。デモモードで実行します。');
-    return {
-      auth: {
-        signInWithPassword: async () => ({ data: { user: null, session: null }, error: null }),
-        signUp: async () => ({ data: { user: null, session: null }, error: null }),
-      },
-      storage: {
-        from: () => ({
-          upload: async () => ({ data: null, error: null }),
-          getPublicUrl: () => ({ data: { publicUrl: '' } }),
-        }),
-      },
-      from: () => ({
-        insert: async () => ({ data: null, error: null }),
-        select: () => ({ data: null, error: null }),
-      }),
-    } as any;
+  // URL形式の検証
+  let urlValid = false;
+  try {
+    if (supabaseUrl) {
+      new URL(supabaseUrl);
+      urlValid = true;
+    }
+  } catch (e) {
+    console.error(`[Supabase] ${environment}側: URLが無効な形式です`, e);
   }
   
-  // 実際の環境変数の値をログ出力（デバッグ用）
-  console.log('実際のSupabase URL:', supabaseUrl);
-  console.log('実際のService Key (最初の10文字):', supabaseServiceKey.substring(0, 10) + '...');
+  // ログ出力
+  console.log(`[Supabase] ${environment}側環境変数チェック:`, {
+    NEXT_PUBLIC_SUPABASE_URL: supabaseUrl ? (urlValid ? '有効' : '無効な形式') : '未設定',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseAnonKey ? `設定済み (${supabaseAnonKey.substring(0, 5)}...)` : '未設定',
+    SUPABASE_SERVICE_ROLE_KEY: supabaseServiceKey ? `設定済み (${supabaseServiceKey?.substring(0, 5)}...)` : (isClient ? 'クライアント側では不要' : '未設定'),
+  });
+  
+  // エラーチェック
+  if (!supabaseUrl || !supabaseAnonKey || (!isClient && !supabaseServiceKey)) {
+    const errorMessage = `[Supabase] ${environment}側: 必要な環境変数が不足しています`;
+    console.error(errorMessage);
+    if (!isClient) {
+      throw new Error(errorMessage);
+    }
+  }
+  
+  return { supabaseUrl, supabaseAnonKey, supabaseServiceKey, isValid: urlValid && !!supabaseUrl && !!supabaseAnonKey };
+}
+
+// カスタムフェッチ関数（デバッグ情報付き）
+const customFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+  console.log(`[Supabase] APIリクエスト:`, {
+    url: typeof input === 'string' ? input : input.toString(),
+    method: init?.method || 'GET',
+  });
   
   try {
-    return createClient<Database>(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        persistSession: false,
-      },
+    const response = await fetch(input, init);
+    console.log(`[Supabase] APIレスポンス:`, {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
     });
-  } catch (error) {
-    console.error('Supabaseクライアント作成エラー:', error);
+    return response;
+  } catch (error: any) {
+    console.error('[Supabase] フェッチエラー:', {
+      error,
+      type: typeof error,
+      properties: Object.keys(error || {}),
+      message: error?.message,
+      stack: error?.stack,
+    });
     throw error;
   }
 };
+
+// クライアント側で使用するSupabaseクライアント
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      storageKey: 'music-school-auth-session',
+      storage: typeof window !== 'undefined' ? localStorage : undefined,
+    },
+    global: {
+      fetch: customFetch,
+    },
+  }
+);
+
+// サーバーサイドSupabaseクライアントの作成関数
+export function createServerSupabaseClient() {
+  const { supabaseUrl, supabaseServiceKey, isValid } = validateAndLogEnvironment();
+  
+  if (!isValid || !supabaseServiceKey) {
+    throw new Error('[Supabase] サーバー側クライアント作成エラー: 有効な環境変数が設定されていません');
+  }
+  
+  // サーバーサイドのクライアント作成（サービスロールキー使用）
+  return createClient(supabaseUrl!, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+    global: {
+      fetch: customFetch,
+    },
+  });
+}
+
+// 環境変数の初期検証を実行（エラーを早期に発見するため）
+validateAndLogEnvironment();
