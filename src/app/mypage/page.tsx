@@ -42,9 +42,50 @@ type Comment = {
   datePosted: string;
 };
 
+// 練習記録のタイプ定義
+type PracticeRecord = {
+  id: number;
+  date: string;
+  duration: number; // 分単位
+  piece: string;
+  notes: string;
+  mood: 'good' | 'normal' | 'bad';
+  feedback?: string;
+  feedbackDate?: string;
+  teacherId?: string;
+  teacherName?: string;
+  studentReply?: string;
+  studentReplyDate?: string;
+  needsFeedback?: boolean;
+};
+
+// 課題のタイプ定義
+type Assignment = {
+  id: number;
+  title: string;
+  description: string;
+  dueDate: string;
+  status: 'not_started' | 'in_progress' | 'completed';
+  feedback?: string;
+  feedbackDate?: string;
+  teacherId?: string;
+  teacherName?: string;
+  studentReply?: string;
+  studentReplyDate?: string;
+  needsFeedback?: boolean;
+};
+
+// 進捗データのタイプ定義
+type ProgressData = {
+  weeklyPractice: { day: string; minutes: number }[];
+  skillLevels: { skill: string; level: number }[];
+  completedAssignments: number;
+  totalAssignments: number;
+};
+
 export default function MyPage() {
   const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'news' | 'videos' | 'profile'>('news');
+  const [activeTab, setActiveTab] = useState<'news' | 'community' | 'profile' | 'progress'>('profile');
   const [loading, setLoading] = useState(true);
   const [news, setNews] = useState<News[]>([]);
   const [videoPosts, setVideoPosts] = useState<VideoPost[]>([]);
@@ -59,6 +100,26 @@ export default function MyPage() {
     level: 'beginner',
     avatarUrl: '',
   });
+  
+  // 進捗管理関連の状態
+  const [practiceRecords, setPracticeRecords] = useState<PracticeRecord[]>([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [progressData, setProgressData] = useState<ProgressData | null>(null);
+  const [newPracticeRecord, setNewPracticeRecord] = useState<Omit<PracticeRecord, 'id'>>({
+    date: new Date().toISOString().split('T')[0],
+    duration: 30,
+    piece: '',
+    notes: '',
+    mood: 'normal'
+  });
+  const [activeProgressTab, setActiveProgressTab] = useState<'practice' | 'assignments' | 'stats'>('practice');
+  
+  // フィードバック関連の状態変数
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<'practice' | 'assignment'>('practice');
+  const [feedbackItemId, setFeedbackItemId] = useState<number | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -167,6 +228,97 @@ export default function MyPage() {
       }
     ]);
     
+    // サンプル練習記録データ
+    setPracticeRecords([
+      {
+        id: 1,
+        date: '2025-03-25',
+        duration: 45,
+        piece: 'ショパン ノクターン Op.9 No.2',
+        notes: '冒頭の右手の表現に注意して練習。左手のアルペジオが安定してきた。',
+        mood: 'good',
+        feedback: '右手のメロディーラインがとても美しいです。次回は左手のアルペジオをもう少し柔らかく弾いてみましょう。',
+        feedbackDate: '2025-03-26',
+        teacherId: 'teacher1',
+        teacherName: '山田先生'
+      },
+      {
+        id: 2,
+        date: '2025-03-23',
+        duration: 30,
+        piece: 'ベートーベン 月光ソナタ 第1楽章',
+        notes: 'テンポが安定しない。もっとメトロノームを使って練習する必要がある。',
+        mood: 'normal'
+      },
+      {
+        id: 3,
+        date: '2025-03-20',
+        duration: 60,
+        piece: 'バッハ インベンション No.1',
+        notes: '両手の独立した動きを意識。少しづつ上達している。',
+        mood: 'good',
+        feedback: 'バッハの対位法がよく理解できています。テンポは一定に保ちながら、各声部の独立性をもっと意識してみてください。',
+        feedbackDate: '2025-03-22',
+        teacherId: 'teacher2',
+        teacherName: '佐藤先生'
+      }
+    ]);
+    
+    // サンプル課題データ
+    setAssignments([
+      {
+        id: 1,
+        title: 'ハノン練習曲 No.1-5',
+        description: '各練習曲を3回ずつ、テンポを少しづつ上げながら練習してください。',
+        dueDate: '2025-04-05',
+        status: 'in_progress',
+        feedback: 'No.3の練習が特に効果的です。指の独立性が向上していますね。次はNo.4に重点を置いてみましょう。',
+        feedbackDate: '2025-03-25',
+        teacherId: 'teacher1',
+        teacherName: '山田先生'
+      },
+      {
+        id: 2,
+        title: 'ショパン ノクターン Op.9 No.2 暗譜',
+        description: '次回のレッスンまでに暗譜できるようにしましょう。特に後半部分に注意。',
+        dueDate: '2025-04-12',
+        status: 'not_started'
+      },
+      {
+        id: 3,
+        title: 'スケール練習 ハ長調とイ短調',
+        description: '両手で4オクターブ、上下とも滑らかに弾けるようにしてください。',
+        dueDate: '2025-03-29',
+        status: 'completed',
+        feedback: '良く練習できています。次はテンポを上げて挑戦しましょう。イ短調の下降形は特に上達していますね。',
+        feedbackDate: '2025-03-24',
+        teacherId: 'teacher2',
+        teacherName: '佐藤先生'
+      }
+    ]);
+    
+    // サンプル進捗データ
+    setProgressData({
+      weeklyPractice: [
+        { day: '月', minutes: 30 },
+        { day: '火', minutes: 45 },
+        { day: '水', minutes: 0 },
+        { day: '木', minutes: 60 },
+        { day: '金', minutes: 30 },
+        { day: '土', minutes: 90 },
+        { day: '日', minutes: 45 }
+      ],
+      skillLevels: [
+        { skill: 'テクニック', level: 3 },
+        { skill: '表現力', level: 4 },
+        { skill: '読譜力', level: 2 },
+        { skill: 'リズム感', level: 3 },
+        { skill: '暗譜力', level: 4 }
+      ],
+      completedAssignments: 5,
+      totalAssignments: 8
+    });
+    
     // プロフィールデータの初期化
     setProfileData({
       name: user?.user_metadata?.name || user?.email?.split('@')[0] || '',
@@ -186,7 +338,7 @@ export default function MyPage() {
         id: 1,
         content: '素晴らしい演奏ですね！特に後半の表現力が素敵です。',
         userName: '音楽教師',
-        userAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100',
+        userAvatar: 'https://images.unsplash.com/photo-1472099645785-be9c29b29330?q=80&w=100',
         datePosted: '2025年3月19日'
       },
       {
@@ -296,72 +448,216 @@ export default function MyPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
-        <p>読み込み中...</p>
-      </div>
-    );
-  }
+  // ホームページに戻る処理
+  const handleHomeNavigation = () => {
+    try {
+      // 現在のセッション情報をローカルストレージに保存して状態を維持
+      const currentUser = user;
+      if (currentUser) {
+        sessionStorage.setItem('userSession', JSON.stringify({
+          isLoggedIn: true,
+          email: currentUser.email,
+          id: currentUser.id,
+          timestamp: new Date().getTime()
+        }));
+      }
+      
+      console.log('[ナビゲーション] ホームページへ遷移します', { 
+        userEmail: currentUser?.email,
+        preservingSession: true 
+      });
+      
+      // 認証情報を保持したままホームページに遷移
+      router.push('/');
+    } catch (error) {
+      console.error('[ナビゲーション] エラー:', error);
+      // エラーが発生した場合でも遷移を試みる
+      router.push('/');
+    }
+  };
 
-  return (
-    <div className={styles.mypageContainer}>
-      <div className={styles.header}>
-        <div className={styles.userInfo}>
-          <div className={styles.avatar} style={{ backgroundImage: `url(${profileData.avatarUrl})` }}></div>
-          <div>
-            <h1>ようこそ、{profileData.name}さん</h1>
-            <p>{profileData.instrument} / {profileData.level === 'beginner' ? '初級' : profileData.level === 'intermediate' ? '中級' : '上級'}</p>
-          </div>
-        </div>
-        <button 
-          className={styles.logoutButton}
-          onClick={handleLogout}
-        >
-          <i className="fas fa-sign-out-alt"></i> ログアウト
-        </button>
-      </div>
+  // 練習記録の追加
+  const handleAddPracticeRecord = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPracticeRecord.piece.trim()) return;
+    
+    const newRecord: PracticeRecord = {
+      id: Date.now(),
+      ...newPracticeRecord
+    };
+    
+    setPracticeRecords([newRecord, ...practiceRecords]);
+    setNewPracticeRecord({
+      date: new Date().toISOString().split('T')[0],
+      duration: 30,
+      piece: '',
+      notes: '',
+      mood: 'normal'
+    });
+  };
+  
+  // 課題のステータス更新
+  const handleUpdateAssignmentStatus = (id: number, status: Assignment['status']) => {
+    setAssignments(assignments.map(assignment => 
+      assignment.id === id ? { ...assignment, status } : assignment
+    ));
+  };
+
+  // フィードバック関連の関数
+  const handleReplyToFeedback = (recordId: number) => {
+    setFeedbackType('practice');
+    setFeedbackItemId(recordId);
+    setFeedbackMessage('');
+    setFeedbackDialogOpen(true);
+  };
+
+  const handleReplyToAssignmentFeedback = (assignmentId: number) => {
+    setFeedbackType('assignment');
+    setFeedbackItemId(assignmentId);
+    setFeedbackMessage('');
+    setFeedbackDialogOpen(true);
+  };
+
+  const handleCancelFeedbackReply = () => {
+    setFeedbackDialogOpen(false);
+    setFeedbackMessage('');
+  };
+
+  const handleSendFeedbackReply = async () => {
+    if (!feedbackMessage.trim()) {
+      alert('返信内容を入力してください');
+      return;
+    }
+
+    try {
+      // APIを呼び出してフィードバック返信を送信
+      const response = await fetch('/api/feedback/reply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: feedbackType,
+          itemId: feedbackItemId,
+          message: feedbackMessage,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '返信の送信に失敗しました');
+      }
+
+      // 成功時の処理
+      alert('返信を送信しました');
+      setFeedbackDialogOpen(false);
+      setFeedbackMessage('');
       
-      <div className={styles.tabsContainer}>
-        <button 
-          className={`${styles.tab} ${activeTab === 'news' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('news')}
-        >
-          <i className="fas fa-newspaper"></i> お知らせ
-        </button>
-        <button 
-          className={`${styles.tab} ${activeTab === 'videos' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('videos')}
-        >
-          <i className="fas fa-video"></i> みんなの演奏
-        </button>
-        <button 
-          className={`${styles.tab} ${activeTab === 'profile' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('profile')}
-        >
-          <i className="fas fa-user"></i> プロフィール
-        </button>
-      </div>
+      // 状態を更新（実際の実装ではAPIから最新データを取得）
+      if (feedbackType === 'practice' && feedbackItemId) {
+        setPracticeRecords(prevRecords =>
+          prevRecords.map(record =>
+            record.id === feedbackItemId
+              ? { ...record, studentReply: feedbackMessage, studentReplyDate: new Date().toISOString().split('T')[0] }
+              : record
+          )
+        );
+      } else if (feedbackType === 'assignment' && feedbackItemId) {
+        setAssignments(prevAssignments =>
+          prevAssignments.map(assignment =>
+            assignment.id === feedbackItemId
+              ? { ...assignment, studentReply: feedbackMessage, studentReplyDate: new Date().toISOString().split('T')[0] }
+              : assignment
+          )
+        );
+      }
+    } catch (error) {
+      console.error('フィードバック返信エラー:', error);
+      alert(error instanceof Error ? error.message : '返信の送信に失敗しました');
+    }
+  };
+
+  const handleRequestFeedback = async (recordId: number) => {
+    try {
+      // APIを呼び出してフィードバックをリクエスト
+      const response = await fetch('/api/feedback', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'practice',
+          itemId: recordId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'フィードバックリクエストに失敗しました');
+      }
+
+      // 成功時の処理
+      alert('講師にフィードバックをリクエストしました');
       
-      <div className={styles.tabContent}>
-        {/* ニュースタブ */}
-        {activeTab === 'news' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h2 className={styles.sectionTitle}>最新のお知らせ</h2>
+      // 状態を更新
+      setPracticeRecords(prevRecords =>
+        prevRecords.map(record =>
+          record.id === recordId
+            ? { ...record, needsFeedback: true }
+            : record
+        )
+      );
+    } catch (error) {
+      console.error('フィードバックリクエストエラー:', error);
+      alert(error instanceof Error ? error.message : 'フィードバックリクエストに失敗しました');
+    }
+  };
+
+  const handleRequestFeedbackForAssignment = async (assignmentId: number) => {
+    try {
+      // APIを呼び出してフィードバックをリクエスト
+      const response = await fetch('/api/feedback', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'assignment',
+          itemId: assignmentId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'フィードバックリクエストに失敗しました');
+      }
+
+      // 成功時の処理
+      alert('講師にフィードバックをリクエストしました');
+      
+      // 状態を更新
+      setAssignments(prevAssignments =>
+        prevAssignments.map(assignment =>
+          assignment.id === assignmentId
+            ? { ...assignment, needsFeedback: true }
+            : assignment
+        )
+      );
+    } catch (error) {
+      console.error('フィードバックリクエストエラー:', error);
+      alert(error instanceof Error ? error.message : 'フィードバックリクエストに失敗しました');
+    }
+  };
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'news':
+        return (
+          <div className={styles.newsSection}>
+            <h3>最新のお知らせ</h3>
             <div className={styles.newsList}>
               {news.map(item => (
-                <motion.div
-                  key={item.id}
-                  className={styles.newsCard}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: item.id * 0.1 }}
-                >
+                <div key={item.id} className={styles.newsCard}>
                   {item.imageUrl && (
                     <div className={styles.newsImage}>
                       <img src={item.imageUrl} alt={item.title} />
@@ -378,293 +674,462 @@ export default function MyPage() {
                     </div>
                     <p>{item.content}</p>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
-        )}
+          </div>
+        );
         
-        {/* 動画共有タブ */}
-        {activeTab === 'videos' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h2 className={styles.sectionTitle}>
-              みんなのピアノ演奏
-              <button className={styles.primaryButton}>
-                <i className="fas fa-plus"></i> 新しい演奏を投稿
-              </button>
-            </h2>
+      case 'community':
+        return (
+          <div className={styles.communitySection}>
+            <h3>コミュニティ</h3>
+            <p>生徒同士の交流や情報共有の場です。</p>
+            <div className={styles.comingSoon}>
+              <i className="fas fa-tools"></i>
+              <p>準備中です。もうしばらくお待ちください。</p>
+            </div>
+          </div>
+        );
+        
+      case 'profile':
+        return (
+          <div className={styles.profileSection}>
+            <h3>プロフィール設定</h3>
+            <div className={styles.profileInfo}>
+              <div className={styles.profileDetail}>
+                <label>名前:</label>
+                <p>{profileData.name}</p>
+              </div>
+              <div className={styles.profileDetail}>
+                <label>楽器:</label>
+                <p>{profileData.instrument}</p>
+              </div>
+              <div className={styles.profileDetail}>
+                <label>レベル:</label>
+                <p>{profileData.level === 'beginner' ? '初級' : 
+                    profileData.level === 'intermediate' ? '中級' : '上級'}</p>
+              </div>
+              <div className={styles.profileDetail}>
+                <label>自己紹介:</label>
+                <p>{profileData.bio}</p>
+              </div>
+            </div>
+            <button className={styles.primaryButton}>
+              <i className="fas fa-edit"></i> プロフィールを編集
+            </button>
+          </div>
+        );
+        
+      case 'progress':
+        return (
+          <div className={styles.progressSection}>
+            <h3>練習と進捗の記録</h3>
             
-            {selectedVideo ? (
-              <div className={styles.videoDetailView}>
-                <button 
-                  className={styles.backButton}
-                  onClick={() => setSelectedVideo(null)}
-                >
-                  <i className="fas fa-arrow-left"></i> 一覧に戻る
-                </button>
-                <div className={styles.videoContainer}>
-                  <iframe
-                    src={selectedVideo.videoUrl}
-                    title={selectedVideo.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className={styles.videoPlayer}
-                  ></iframe>
-                </div>
-                <div className={styles.videoInfo}>
-                  <h3>{selectedVideo.title}</h3>
-                  <div className={styles.videoMeta}>
-                    <div className={styles.videoUser}>
-                      <img src={selectedVideo.userAvatar} alt={selectedVideo.userName} className={styles.userAvatar} />
-                      <span>{selectedVideo.userName}</span>
-                    </div>
-                    <span className={styles.videoDate}>{selectedVideo.datePosted}</span>
-                  </div>
-                  <p className={styles.videoDescription}>{selectedVideo.description}</p>
-                  <div className={styles.videoActions}>
-                    <button 
-                      className={`${styles.likeButton} ${selectedVideo.liked ? styles.liked : ''}`}
-                      onClick={() => handleLike(selectedVideo.id)}
-                    >
-                      <i className={`${selectedVideo.liked ? 'fas' : 'far'} fa-heart`}></i>
-                      {selectedVideo.likes}
-                    </button>
-                    <span className={styles.commentCount}>
-                      <i className="far fa-comment"></i> {comments.length} コメント
-                    </span>
-                  </div>
-                </div>
-                
-                <div className={styles.commentsSection}>
-                  <h4>コメント</h4>
-                  <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
-                    <div className={styles.commentInput}>
-                      <img src={profileData.avatarUrl} alt="あなた" className={styles.userAvatar} />
-                      <textarea
-                        placeholder="演奏へのコメントを書く..."
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
+            <div className={styles.progressTabsContainer}>
+              <button 
+                className={`${styles.progressTab} ${activeProgressTab === 'practice' ? styles.activeProgressTab : ''}`}
+                onClick={() => setActiveProgressTab('practice')}
+              >
+                <i className="fas fa-music"></i> 練習記録
+              </button>
+              <button 
+                className={`${styles.progressTab} ${activeProgressTab === 'assignments' ? styles.activeProgressTab : ''}`}
+                onClick={() => setActiveProgressTab('assignments')}
+              >
+                <i className="fas fa-tasks"></i> 課題
+              </button>
+              <button 
+                className={`${styles.progressTab} ${activeProgressTab === 'stats' ? styles.activeProgressTab : ''}`}
+                onClick={() => setActiveProgressTab('stats')}
+              >
+                <i className="fas fa-chart-bar"></i> 統計
+              </button>
+            </div>
+            
+            {/* 練習記録タブ */}
+            {activeProgressTab === 'practice' && (
+              <div className={styles.practiceSection}>
+                <form onSubmit={handleAddPracticeRecord} className={styles.practiceForm}>
+                  <h3>新しい練習記録を追加</h3>
+                  <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="practice-date">日付</label>
+                      <input
+                        type="date"
+                        id="practice-date"
+                        value={newPracticeRecord.date}
+                        onChange={(e) => setNewPracticeRecord({...newPracticeRecord, date: e.target.value})}
                         required
-                      ></textarea>
+                      />
                     </div>
-                    <button type="submit" className={styles.primaryButton}>コメントする</button>
-                  </form>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="practice-duration">練習時間（分）</label>
+                      <input
+                        type="number"
+                        id="practice-duration"
+                        min="5"
+                        step="5"
+                        value={newPracticeRecord.duration}
+                        onChange={(e) => setNewPracticeRecord({...newPracticeRecord, duration: parseInt(e.target.value)})}
+                        required
+                      />
+                    </div>
+                  </div>
                   
-                  <div className={styles.commentsList}>
-                    {comments.map(comment => (
-                      <div key={comment.id} className={styles.commentItem}>
-                        <img src={comment.userAvatar} alt={comment.userName} className={styles.userAvatar} />
-                        <div className={styles.commentContent}>
-                          <div className={styles.commentHeader}>
-                            <span className={styles.commentUser}>{comment.userName}</span>
-                            <span className={styles.commentDate}>{comment.datePosted}</span>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="practice-piece">練習した曲</label>
+                    <input
+                      type="text"
+                      id="practice-piece"
+                      value={newPracticeRecord.piece}
+                      onChange={(e) => setNewPracticeRecord({...newPracticeRecord, piece: e.target.value})}
+                      placeholder="例: ショパン ノクターン Op.9 No.2"
+                      required
+                    />
+                  </div>
+                  
+                  <div className={styles.formGroup}>
+                    <label htmlFor="practice-notes">メモ</label>
+                    <textarea
+                      id="practice-notes"
+                      value={newPracticeRecord.notes}
+                      onChange={(e) => setNewPracticeRecord({...newPracticeRecord, notes: e.target.value})}
+                      placeholder="今日の練習内容や気づいたことを記録しましょう"
+                      rows={3}
+                    ></textarea>
+                  </div>
+                  
+                  <div className={styles.formGroup}>
+                    <label>今日の調子</label>
+                    <div className={styles.moodSelector}>
+                      <button
+                        type="button"
+                        className={`${styles.moodButton} ${newPracticeRecord.mood === 'bad' ? styles.activeMood : ''}`}
+                        onClick={() => setNewPracticeRecord({...newPracticeRecord, mood: 'bad'})}
+                      >
+                        <i className="fas fa-frown"></i> イマイチ
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.moodButton} ${newPracticeRecord.mood === 'normal' ? styles.activeMood : ''}`}
+                        onClick={() => setNewPracticeRecord({...newPracticeRecord, mood: 'normal'})}
+                      >
+                        <i className="fas fa-meh"></i> 普通
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.moodButton} ${newPracticeRecord.mood === 'good' ? styles.activeMood : ''}`}
+                        onClick={() => setNewPracticeRecord({...newPracticeRecord, mood: 'good'})}
+                      >
+                        <i className="fas fa-smile"></i> 良い
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.formSubmitArea}>
+                    <button type="submit" className={styles.submitButton}>
+                      <i className="fas fa-plus"></i> 練習記録を保存する
+                    </button>
+                  </div>
+                </form>
+                
+                <div className={styles.practiceRecordsList}>
+                  <h3>練習記録</h3>
+                  {practiceRecords.length === 0 ? (
+                    <p className={styles.emptyMessage}>練習記録がありません。最初の記録を追加しましょう！</p>
+                  ) : (
+                    practiceRecords.map(record => (
+                      <div key={record.id} className={styles.practiceRecordCard}>
+                        <div className={styles.practiceRecordHeader}>
+                          <div className={styles.practiceRecordDate}>
+                            <i className="far fa-calendar"></i> {record.date}
                           </div>
-                          <p>{comment.content}</p>
+                          <div className={styles.practiceRecordDuration}>
+                            <i className="far fa-clock"></i> {record.duration}分
+                          </div>
+                          <div className={`${styles.practiceRecordMood} ${
+                            record.mood === 'good' ? styles.moodGood : 
+                            record.mood === 'normal' ? styles.moodNormal : 
+                            styles.moodBad
+                          }`}>
+                            <i className={`fas fa-${
+                              record.mood === 'good' ? 'smile' : 
+                              record.mood === 'normal' ? 'meh' : 
+                              'frown'
+                            }`}></i>
+                          </div>
+                        </div>
+                        <h4>{record.piece}</h4>
+                        <p>{record.notes || '特記事項なし'}</p>
+                        
+                        {record.feedback ? (
+                          <div className={styles.feedbackSection}>
+                            <div className={styles.feedbackHeader}>
+                              <h5><i className="fas fa-comment-dots"></i> 講師からのフィードバック</h5>
+                              <div className={styles.feedbackMeta}>
+                                <span className={styles.teacherName}>{record.teacherName}</span>
+                                <span className={styles.feedbackDate}>{record.feedbackDate}</span>
+                              </div>
+                            </div>
+                            <p className={styles.feedbackContent}>{record.feedback}</p>
+                            <button 
+                              className={styles.replyButton}
+                              onClick={() => handleReplyToFeedback(record.id)}
+                            >
+                              <i className="fas fa-reply"></i> 返信する
+                            </button>
+                          </div>
+                        ) : (
+                          <div className={styles.noFeedback}>
+                            <p><i className="fas fa-info-circle"></i> まだフィードバックはありません</p>
+                          </div>
+                        )}
+                        
+                        <div className={styles.practiceRecordActions}>
+                          <button 
+                            className={styles.secondaryButton}
+                            onClick={() => handleRequestFeedback(record.id)}
+                          >
+                            <i className="fas fa-question-circle"></i> フィードバックをリクエスト
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* 課題タブ */}
+            {activeProgressTab === 'assignments' && (
+              <div className={styles.assignmentsSection}>
+                <h3>課題一覧</h3>
+                
+                {assignments.length === 0 ? (
+                  <p className={styles.emptyMessage}>現在、課題はありません。</p>
+                ) : (
+                  <div className={styles.assignmentsList}>
+                    {assignments.map(assignment => (
+                      <div key={assignment.id} className={styles.assignmentCard}>
+                        <div className={styles.assignmentHeader}>
+                          <h4>{assignment.title}</h4>
+                          <div className={`${styles.assignmentStatus} ${
+                            assignment.status === 'completed' ? styles.statusCompleted : 
+                            assignment.status === 'in_progress' ? styles.statusInProgress : 
+                            styles.statusNotStarted
+                          }`}>
+                            {assignment.status === 'completed' ? '完了' : 
+                             assignment.status === 'in_progress' ? '取組中' : 
+                             '未着手'}
+                          </div>
+                        </div>
+                        <div className={styles.assignmentDueDate}>
+                          <i className="far fa-calendar-alt"></i> 期限: {assignment.dueDate}
+                        </div>
+                        <p>{assignment.description}</p>
+                        
+                        {assignment.feedback && (
+                          <div className={styles.feedbackSection}>
+                            <div className={styles.feedbackHeader}>
+                              <h5><i className="fas fa-comment-dots"></i> 講師からのフィードバック</h5>
+                              <div className={styles.feedbackMeta}>
+                                <span className={styles.teacherName}>{assignment.teacherName}</span>
+                                <span className={styles.feedbackDate}>{assignment.feedbackDate}</span>
+                              </div>
+                            </div>
+                            <p className={styles.feedbackContent}>{assignment.feedback}</p>
+                            <button 
+                              className={styles.replyButton}
+                              onClick={() => handleReplyToAssignmentFeedback(assignment.id)}
+                            >
+                              <i className="fas fa-reply"></i> 返信する
+                            </button>
+                          </div>
+                        )}
+                        
+                        <div className={styles.assignmentActions}>
+                          {assignment.status !== 'completed' && (
+                            <button 
+                              className={styles.primaryButton}
+                              onClick={() => handleUpdateAssignmentStatus(assignment.id, 'completed')}
+                            >
+                              <i className="fas fa-check"></i> 完了にする
+                            </button>
+                          )}
+                          
+                          {assignment.status === 'not_started' && (
+                            <button 
+                              className={styles.secondaryButton}
+                              onClick={() => handleUpdateAssignmentStatus(assignment.id, 'in_progress')}
+                            >
+                              <i className="fas fa-play"></i> 取組中にする
+                            </button>
+                          )}
+                          
+                          {assignment.status === 'completed' && (
+                            <button 
+                              className={styles.secondaryButton}
+                              onClick={() => handleUpdateAssignmentStatus(assignment.id, 'in_progress')}
+                            >
+                              <i className="fas fa-undo"></i> 取組中に戻す
+                            </button>
+                          )}
+                          
+                          {!assignment.feedback && assignment.status === 'completed' && (
+                            <button 
+                              className={styles.secondaryButton}
+                              onClick={() => handleRequestFeedbackForAssignment(assignment.id)}
+                            >
+                              <i className="fas fa-question-circle"></i> フィードバックをリクエスト
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              </div>
-            ) : (
-              <div className={styles.videoGrid}>
-                {videoPosts.map(video => (
-                  <motion.div
-                    key={video.id}
-                    className={styles.videoCard}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: video.id * 0.1 }}
-                  >
-                    <div 
-                      className={styles.videoThumbnail}
-                      onClick={() => handleVideoSelect(video)}
-                    >
-                      <img src={video.thumbnailUrl} alt={video.title} />
-                      <div className={styles.playButton}>
-                        <i className="fas fa-play"></i>
-                      </div>
-                    </div>
-                    <div className={styles.videoCardInfo}>
-                      <h3 onClick={() => handleVideoSelect(video)}>{video.title}</h3>
-                      <div className={styles.videoCardMeta}>
-                        <div className={styles.videoUser}>
-                          <img src={video.userAvatar} alt={video.userName} className={styles.userAvatar} />
-                          <span>{video.userName}</span>
-                        </div>
-                        <span className={styles.videoDate}>{video.datePosted}</span>
-                      </div>
-                      <div className={styles.videoCardActions}>
-                        <button 
-                          className={`${styles.likeButton} ${video.liked ? styles.liked : ''}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLike(video.id);
-                          }}
-                        >
-                          <i className={`${video.liked ? 'fas' : 'far'} fa-heart`}></i>
-                          {video.likes}
-                        </button>
-                        <span className={styles.commentCount}>
-                          <i className="far fa-comment"></i> {video.commentsCount}
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+                )}
               </div>
             )}
-          </motion.div>
-        )}
-        
-        {/* プロフィールタブ */}
-        {activeTab === 'profile' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className={styles.profileSection}
-          >
-            <h2 className={styles.sectionTitle}>プロフィール設定</h2>
             
-            {editingProfile ? (
-              <form onSubmit={handleProfileUpdate} className={styles.profileForm}>
-                <div className={styles.avatarUpload}>
-                  <div 
-                    className={styles.avatarPreview} 
-                    style={{ backgroundImage: `url(${profileData.avatarUrl})` }}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <div className={styles.avatarOverlay}>
-                      <i className="fas fa-camera"></i>
-                    </div>
+            {/* 統計タブ */}
+            {activeProgressTab === 'stats' && progressData && (
+              <div className={styles.statsSection}>
+                <div className={styles.statsSummary}>
+                  <div className={styles.statCard}>
+                    <div className={styles.statValue}>{progressData.weeklyPractice.reduce((sum, day) => sum + day.minutes, 0)}分</div>
+                    <div className={styles.statLabel}>今週の練習時間</div>
                   </div>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleAvatarChange}
-                    accept="image/*"
-                    className={styles.fileInput}
-                  />
-                </div>
-                
-                <div className={styles.formGroup}>
-                  <label htmlFor="name">表示名</label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={profileData.name}
-                    onChange={e => setProfileData({...profileData, name: e.target.value})}
-                    required
-                  />
-                </div>
-                
-                <div className={styles.formGroup}>
-                  <label htmlFor="bio">自己紹介</label>
-                  <textarea
-                    id="bio"
-                    value={profileData.bio}
-                    onChange={e => setProfileData({...profileData, bio: e.target.value})}
-                    rows={4}
-                  ></textarea>
-                </div>
-                
-                <div className={styles.formRow}>
-                  <div className={styles.formGroup}>
-                    <label htmlFor="instrument">演奏楽器</label>
-                    <select
-                      id="instrument"
-                      value={profileData.instrument}
-                      onChange={e => setProfileData({...profileData, instrument: e.target.value})}
-                    >
-                      <option value="ピアノ">ピアノ</option>
-                      <option value="ギター">ギター</option>
-                      <option value="バイオリン">バイオリン</option>
-                      <option value="ドラム">ドラム</option>
-                      <option value="フルート">フルート</option>
-                      <option value="その他">その他</option>
-                    </select>
+                  <div className={styles.statCard}>
+                    <div className={styles.statValue}>{progressData.completedAssignments}/{progressData.totalAssignments}</div>
+                    <div className={styles.statLabel}>課題達成率</div>
                   </div>
-                  
-                  <div className={styles.formGroup}>
-                    <label htmlFor="level">習熟レベル</label>
-                    <select
-                      id="level"
-                      value={profileData.level}
-                      onChange={e => setProfileData({...profileData, level: e.target.value as any})}
-                    >
-                      <option value="beginner">初級</option>
-                      <option value="intermediate">中級</option>
-                      <option value="advanced">上級</option>
-                    </select>
+                  <div className={styles.statCard}>
+                    <div className={styles.statValue}>{practiceRecords.length}</div>
+                    <div className={styles.statLabel}>記録した練習</div>
                   </div>
-                </div>
-                
-                <div className={styles.formActions}>
-                  <button type="submit" className={styles.primaryButton}>保存する</button>
-                  <button 
-                    type="button" 
-                    className={styles.secondaryButton}
-                    onClick={() => setEditingProfile(false)}
-                  >
-                    キャンセル
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className={styles.profileDisplay}>
-                <div className={styles.profileHeader}>
-                  <div 
-                    className={styles.profileAvatar} 
-                    style={{ backgroundImage: `url(${profileData.avatarUrl})` }}
-                  ></div>
-                  <div className={styles.profileInfo}>
-                    <h3>{profileData.name}</h3>
-                    <p className={styles.profileMeta}>
-                      {profileData.instrument} / 
-                      {profileData.level === 'beginner' ? '初級' : 
-                       profileData.level === 'intermediate' ? '中級' : '上級'}
-                    </p>
-                    <button 
-                      className={styles.editButton}
-                      onClick={() => setEditingProfile(true)}
-                    >
-                      <i className="fas fa-edit"></i> 編集する
-                    </button>
-                  </div>
-                </div>
-                
-                <div className={styles.profileBio}>
-                  <h4>自己紹介</h4>
-                  <p>{profileData.bio || '自己紹介はまだ設定されていません。'}</p>
-                </div>
-                
-                <div className={styles.accountInfo}>
-                  <h4>アカウント情報</h4>
-                  <div className={styles.infoRow}>
-                    <span className={styles.infoLabel}>メールアドレス</span>
-                    <span className={styles.infoValue}>{user.email}</span>
-                  </div>
-                  <div className={styles.infoRow}>
-                    <span className={styles.infoLabel}>登録日</span>
-                    <span className={styles.infoValue}>
-                      {new Date(user.created_at).toLocaleDateString('ja-JP')}
-                    </span>
-                  </div>
-                  <button className={styles.secondaryButton}>
-                    <i className="fas fa-key"></i> パスワード変更
-                  </button>
                 </div>
               </div>
             )}
-          </motion.div>
-        )}
+          </div>
+        );
+        
+      default:
+        return <div>コンテンツが見つかりません</div>;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingSpinner}></div>
+        <p>読み込み中...</p>
       </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <div className={styles.userInfo}>
+          <div className={styles.userAvatar}>
+            {profileData?.avatarUrl ? (
+              <img src={profileData.avatarUrl} alt="User Avatar" />
+            ) : (
+              <div className={styles.defaultAvatar}>
+                <i className="fas fa-user"></i>
+              </div>
+            )}
+          </div>
+          <div className={styles.userName}>
+            <h2>{profileData?.name || 'ユーザー'}</h2>
+            <p>{user?.email}</p>
+          </div>
+        </div>
+        <div className={styles.headerActions}>
+          <button onClick={handleHomeNavigation} className={styles.homeButton}>
+            <i className="fas fa-home"></i> ホームページに戻る
+          </button>
+          <button className={styles.logoutButton} onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt"></i> ログアウト
+          </button>
+        </div>
+      </div>
+      
+      <div className={styles.tabsContainer}>
+        <button 
+          className={`${styles.tabButton} ${activeTab === 'profile' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('profile')}
+        >
+          <i className="fas fa-user"></i> プロフィール
+        </button>
+        <button 
+          className={`${styles.tabButton} ${activeTab === 'news' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('news')}
+        >
+          <i className="fas fa-newspaper"></i> お知らせ
+        </button>
+        <button 
+          className={`${styles.tabButton} ${activeTab === 'community' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('community')}
+        >
+          <i className="fas fa-users"></i> コミュニティ
+        </button>
+        <button 
+          className={`${styles.tabButton} ${activeTab === 'progress' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('progress')}
+        >
+          <i className="fas fa-chart-line"></i> 進捗管理
+        </button>
+      </div>
+      
+      <div className={styles.contentContainer}>
+        {renderTabContent()}
+      </div>
+      
+      {/* フィードバック返信ダイアログ */}
+      {feedbackDialogOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3>講師へのメッセージ</h3>
+              <button 
+                className={styles.closeButton}
+                onClick={handleCancelFeedbackReply}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p>
+                {feedbackType === 'practice' ? '練習記録' : '課題'}へのフィードバックに返信します。
+                質問や補足情報を入力してください。
+              </p>
+              <textarea
+                className={styles.feedbackTextarea}
+                value={feedbackMessage}
+                onChange={(e) => setFeedbackMessage(e.target.value)}
+                placeholder="メッセージを入力してください..."
+                rows={5}
+              ></textarea>
+            </div>
+            <div className={styles.modalFooter}>
+              <button 
+                className={styles.cancelButton}
+                onClick={handleCancelFeedbackReply}
+              >
+                キャンセル
+              </button>
+              <button 
+                className={styles.submitButton}
+                onClick={handleSendFeedbackReply}
+              >
+                送信する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

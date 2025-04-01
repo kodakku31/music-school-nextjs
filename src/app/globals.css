@@ -15,6 +15,8 @@
   --nav-panel-width: 14%;
   --content-padding: 20px;
   --border-color: var(--color-black);
+  --mobile-breakpoint: 768px;
+  --small-mobile-breakpoint: 480px;
 }
 
 * {
@@ -93,10 +95,12 @@ p {
   border-right: 1px solid var(--border-color);
 }
 
+/* 画像コンテナとスライドショー */
 .image-container {
   width: 100%;
   height: 100%;
   position: relative;
+  overflow: hidden;
 }
 
 .image-slide {
@@ -106,8 +110,13 @@ p {
   width: 100%;
   height: 100%;
   opacity: 0;
-  transition: opacity 1.5s ease;
-  background-color: #f5f5f5;
+  transition: opacity 1s ease-in-out;
+  z-index: 1;
+}
+
+.image-slide.active {
+  opacity: 1;
+  z-index: 2;
 }
 
 .image-slide img {
@@ -115,10 +124,6 @@ p {
   height: 100%;
   object-fit: cover;
   object-position: center;
-}
-
-.image-slide.active {
-  opacity: 1;
 }
 
 /* 右端パネル（ナビゲーションエリア） */
@@ -143,6 +148,101 @@ p {
   height: 100%;
   margin-left: var(--left-panel-width);
   overflow-y: auto;
+}
+
+/* モバイル対応のレスポンシブデザイン */
+@media (max-width: 768px) {
+  /* 左パネルを非表示 */
+  .left-panel {
+    display: none;
+  }
+  
+  /* 右パネルを非表示（ハンバーガーメニューに置き換え） */
+  .nav-panel {
+    display: none;
+  }
+  
+  /* メインパネルを全幅に */
+  .main-panel {
+    width: 100%;
+    margin-left: 0;
+    padding: 1rem;
+  }
+  
+  /* フォントサイズを調整 */
+  body {
+    font-size: 14px;
+  }
+  
+  h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  /* ロゴを小さく */
+  .logo-mark {
+    width: 120px;
+    height: 80px;
+  }
+  
+  .logo-title {
+    font-size: 2rem;
+  }
+  
+  /* タッチ操作の改善 */
+  a, button {
+    padding: 0.5rem;
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* フォームの入力欄を大きく */
+  input, textarea, select {
+    font-size: 16px; /* iOSでズームインを防止 */
+    padding: 12px;
+  }
+  
+  /* ボタンを大きく */
+  .button, button[type="submit"] {
+    padding: 12px 24px;
+  }
+}
+
+/* 小さいモバイル画面用 */
+@media (max-width: 480px) {
+  .main-nav ul {
+    flex-direction: column;
+  }
+  
+  .logo-title {
+    font-size: 1.8rem;
+  }
+  
+  body {
+    padding: 10px;
+  }
+  
+  .wrapper {
+    border: none;
+  }
+  
+  /* コンテンツの余白を調整 */
+  .main-panel {
+    padding: 0.5rem;
+  }
+  
+  /* グリッドレイアウトを1列に */
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ファーストビュー */
@@ -220,89 +320,232 @@ p {
   margin-bottom: 1.5rem;
   text-align: center;
   width: 100%;
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
 }
 
 .login-button {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: var(--color-light-gray);
-  font-size: 0.8rem;
-  font-weight: 300;
-  width: 100%;
-  text-align: center;
+  background-color: #6a64f1;
+  color: white;
+  border: none;
   border-radius: 3px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
 }
 
 .login-button:hover {
+  background-color: #5a54e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(106, 100, 241, 0.3);
+}
+
+/* ログイン/ログアウト関連のスタイル */
+.login-container {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.login-button, .logout-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-black);
+  background-color: transparent;
+  color: var(--color-black);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.login-button:hover, .logout-button:hover {
   background-color: var(--color-black);
   color: var(--color-white);
-  opacity: 1;
 }
 
-/* SNSリンク */
-.social-links {
-  text-align: center;
-  margin-bottom: 2rem;
+.user-menu {
   display: flex;
-  justify-content: center;
-}
-
-.social-link {
-  display: flex;
-  justify-content: center;
   align-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: var(--color-light-gray);
-  transition: background-color 0.3s ease;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(5px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  max-width: 150px;
 }
 
-.social-link:hover {
-  background-color: #f0f0f0;
-  opacity: 1;
+.user-menu:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
-.social-link svg {
-  width: 20px;
-  height: 20px;
-  fill: var(--color-black);
-  transition: fill 0.3s ease;
-}
-
-/* スクロールインジケーター */
-.scroll-indicator {
+.user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+  width: 100%;
   text-align: center;
-  margin-top: 2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.user-status {
+  color: #4CAF50;
+  font-size: 0.5rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.user-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+/* マイページボタン */
+.mypage-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #6a64f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
   cursor: pointer;
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+  width: 100%;
 }
 
-.scroll-indicator span {
-  display: block;
+.mypage-button:hover {
+  background-color: #5a54e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(106, 100, 241, 0.3);
+}
+
+.mypage-text {
+  white-space: nowrap;
+}
+
+/* ログアウトボタン */
+.logout-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #f1f1f1;
+  color: #333;
+  border: none;
+  border-radius: 6px;
   font-size: 0.8rem;
-  margin-bottom: 0.5rem;
-  font-weight: 300;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  width: 100%;
 }
 
-.scroll-arrow {
-  font-size: 0.8rem;
-  animation: bounce 2s infinite;
+.logout-button:hover {
+  background-color: #e1e1e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
+.logout-text {
+  white-space: nowrap;
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  .user-menu {
+    padding: 0.5rem;
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto;
   }
-  40% {
-    transform: translateY(-10px);
+  
+  .user-name {
+    font-size: 0.9rem;
+    max-width: 150px;
   }
-  60% {
-    transform: translateY(-5px);
+  
+  .user-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .mypage-button, .logout-button {
+    width: 100%;
+    justify-content: center;
+    padding: 0.7rem 1rem;
+  }
+}
+
+/* ローディングスピナー */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--color-black);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -1509,33 +1752,71 @@ p {
   justify-content: center;
 }
 
-/* レスポンシブ対応 - レッスンページ */
-@media (max-width: 768px) {
-  .lesson-item {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  
-  .plan-cards {
-    flex-direction: column;
-  }
-  
-  .plan-card {
-    min-width: 100%;
-  }
-  
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .lesson-info {
-    padding: 1.5rem;
-  }
-  
-  .lesson-actions {
-    flex-direction: column;
-  }
+/* 認証フォームのスタイル */
+.auth-form-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.auth-form-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-form-header h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.auth-form-header p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.error-message i {
+  margin-right: 0.5rem;
+}
+
+.error-message span {
+  flex: 1;
+}
+
+.retry-countdown {
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  width: 100%;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
 }
 
 /* 講師紹介ページ */
@@ -1664,8 +1945,9 @@ p {
 }
 
 .teacher-skills h4 {
-  font-weight: 500;
+  font-size: 1.1rem;
   margin-bottom: 1rem;
+  font-weight: 500;
 }
 
 .skill-bars {
@@ -2184,55 +2466,4 @@ p {
   color: var(--color-black);
   text-decoration: underline;
   font-size: 0.875rem;
-}
-
-/* ユーザーメニュー */
-.user-menu {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.user-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.logout-button {
-  background: none;
-  border: 1px solid var(--color-black);
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.logout-button:hover {
-  background-color: var(--color-black);
-  color: var(--color-white);
-}
-
-/* ローディングスピナー */
-.loading-spinner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border-top-color: var(--color-black);
-  animation: spin 1s ease-in-out infinite;
-  margin-bottom: 1rem;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 // バリデーションスキーマ
 const loginSchema = z.object({
@@ -26,11 +27,16 @@ const registerSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function AuthForm() {
+type AuthFormProps = {
+  onSuccess?: () => void;
+};
+
+export default function AuthForm({ onSuccess }: AuthFormProps) {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [retryCountdown, setRetryCountdown] = useState<number | null>(null);
   const router = useRouter();
 
   // ログインフォーム
@@ -55,56 +61,152 @@ export default function AuthForm() {
 
   // ログイン処理
   const handleLogin = async (data: LoginFormValues) => {
-    try {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      console.log('ログイン開始：', data.email);
-      
-      // 環境変数が設定されているか確認
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-      
-      console.log('環境変数チェック:', { 
-        url: supabaseUrl ? 'Set (not empty)' : 'Not set (empty)', 
-        key: supabaseKey ? 'Set (not empty)' : 'Not set (empty)' 
-      });
-      
-      if (!supabaseUrl || !supabaseKey) {
-        console.error('Supabase環境変数が設定されていません');
-        setError('Supabase環境変数が設定されていません。.env.localファイルを確認してください。');
-        setLoading(false);
-        return;
-      }
-      
-      // 直接Supabaseクライアントを使用してログイン
-      try {
-        console.log('直接Supabaseクライアントを使用してログインを試みます');
-        
-        const { supabase } = await import('@/lib/supabase/client');
-        
-        const { error, data: authData } = await supabase.auth.signInWithPassword({
+    try {
+      console.log('[認証] ログイン開始:', { email: data.email });
+
+      // サーバーAPIを使用してログイン
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           email: data.email,
           password: data.password,
+        }),
+      });
+
+      // ネットワークエラーではなくHTTPエラーの詳細ログ
+      console.log('[認証] ログインAPIレスポンス:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        // レスポンス全体のデバッグ情報も記録
+        console.error('[認証] ログインAPIレスポンス詳細:', {
+          status: response.status,
+          statusText: response.statusText,
+          result: result // 結果全体をログ
         });
         
-        if (error) {
-          console.error('Supabaseログインエラー:', error);
-          throw new Error(error.message || 'ログインに失敗しました');
+        // エラー情報の安全な取得（undefined対策）
+        const errorMessage = 
+          (result?.error || result?.message || 'ログイン中にエラーが発生しました');
+        const errorDetails = 
+          (result?.details || result?.error || result?.message || '詳細なし');
+        
+        console.error('[認証] ログインAPIエラー詳細:', {
+          errorMessage,
+          errorDetails
+        });
+        
+        // ステータスコードに基づいたエラーメッセージの生成
+        let displayError = errorMessage;
+        if (response.status === 401) {
+          displayError = 'メールアドレスまたはパスワードが正しくありません';
+        } else if (response.status === 404) {
+          displayError = 'APIエンドポイントが見つかりません';
+        } else if (response.status === 429) {
+          // レート制限エラーの詳細な処理
+          displayError = 'リクエストが多すぎます。しばらく待ってから再度お試しください';
+          
+          // サーバーから推奨される待機時間を取得
+          const retryAfter = result.retryAfter || 60;
+          
+          // カウントダウンを設定
+          setRetryCountdown(retryAfter);
+          
+          // カウントダウンタイマーを開始
+          const countdownInterval = setInterval(() => {
+            setRetryCountdown(prev => {
+              if (prev === null || prev <= 1) {
+                clearInterval(countdownInterval);
+                setLoading(false);
+                setError('再度ログインを試みることができます');
+                return null;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+          
+          // サーバーからの提案があれば表示
+          if (result.suggestion) {
+            displayError += `\n${result.suggestion}`;
+          }
+          
+          // 一時的にフォームを無効化
+          loginForm.reset();
+          setLoading(true);
+        } else if (response.status >= 500) {
+          displayError = 'サーバーエラーが発生しました。しばらく経ってからもう一度お試しください';
         }
-
-        // ログイン成功
-        console.log('ログイン成功:', authData?.user?.id);
-        setSuccess('ログインに成功しました。リダイレクトします...');
-        router.push('/');
-        router.refresh();
-      } catch (loginError: any) {
-        console.error('ログインエラー詳細:', loginError, typeof loginError, Object.keys(loginError));
-        throw new Error(`ログインエラー: ${loginError.message || '不明なエラー'}`);
+        
+        setError(displayError);
+        return;
       }
+
+      // ログイン成功
+      console.log('[認証] ログイン成功:', { 
+        userId: result.user?.id,
+        sessionExpires: result.session?.expires_at 
+      });
+      
+      // クライアント側でセッションを明示的に設定
+      try {
+        const supabase = createClientComponentClient();
+        const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+          access_token: result.session.access_token,
+          refresh_token: result.session.refresh_token
+        });
+        
+        if (sessionError) {
+          console.error('[認証] セッション設定エラー:', sessionError);
+        } else {
+          console.log('[認証] クライアント側でセッションを設定しました:', {
+            userId: sessionData.user?.id,
+            email: sessionData.user?.email
+          });
+        }
+      } catch (sessionSetError) {
+        console.error('[認証] セッション設定中の例外:', sessionSetError);
+      }
+      
+      setSuccess('ログインに成功しました。リダイレクトします...');
+      
+      // 認証状態を更新するためにページをリフレッシュ
+      setTimeout(() => {
+        // 成功時のコールバックがあれば実行
+        if (onSuccess) {
+          onSuccess();
+        }
+        router.push('/mypage');
+        router.refresh();
+        // ブラウザのリロードを強制して認証状態を確実に更新
+        window.location.href = '/mypage';
+      }, 1000);
     } catch (error: any) {
-      console.error('エラー発生:', error, typeof error, Object.keys(error));
-      setError(error.message || 'ログインに失敗しました。メールアドレスとパスワードを確認してください。');
+      // ネットワークエラーの詳細ログ（通常はFailed to fetchなど）
+      console.error('[認証] ログイン実行エラー:', {
+        error,
+        message: error?.message,
+        type: typeof error,
+        stack: error?.stack,
+        properties: Object.keys(error || {})
+      });
+      
+      // ネットワークエラーの場合はユーザーフレンドリーなメッセージを表示
+      if (error?.message === 'Failed to fetch') {
+        setError('サーバーに接続できません。インターネット接続を確認するか、しばらく経ってからもう一度お試しください');
+      } else {
+        setError(error?.message || 'ログイン中に予期しないエラーが発生しました');
+      }
     } finally {
       setLoading(false);
     }
@@ -112,60 +214,108 @@ export default function AuthForm() {
 
   // 会員登録処理
   const handleRegister = async (data: RegisterFormValues) => {
-    try {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      console.log('登録開始：', data.email);
-      
-      // 環境変数が設定されているか確認
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-      
-      console.log('環境変数チェック:', { 
-        url: supabaseUrl ? 'Set (not empty)' : 'Not set (empty)', 
-        key: supabaseKey ? 'Set (not empty)' : 'Not set (empty)' 
-      });
-      
-      if (!supabaseUrl || !supabaseKey) {
-        console.error('Supabase環境変数が設定されていません');
-        setError('Supabase環境変数が設定されていません。.env.localファイルを確認してください。');
-        setLoading(false);
-        return;
-      }
-      
-      // 直接Supabaseクライアントを使用して会員登録
-      try {
-        console.log('直接Supabaseクライアントを使用して会員登録を試みます');
-        
-        const { supabase } = await import('@/lib/supabase/client');
-        
-        const { error, data: authData } = await supabase.auth.signUp({
+    try {
+      console.log('[認証] 会員登録開始:', { email: data.email, name: data.name });
+
+      // サーバーAPIを使用して会員登録
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           email: data.email,
           password: data.password,
-          options: {
-            data: {
-              name: data.name || '',
-            },
-          },
+          name: data.name,
+        }),
+      });
+
+      // ネットワークエラーではなくHTTPエラーの詳細ログ
+      console.log('[認証] 会員登録APIレスポンス:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        // レスポンス全体のデバッグ情報も記録
+        console.error('[認証] 会員登録APIレスポンス詳細:', {
+          status: response.status,
+          statusText: response.statusText,
+          result: result // 結果全体をログ
         });
         
-        if (error) {
-          console.error('Supabase会員登録エラー:', error);
-          throw new Error(error.message || '会員登録に失敗しました');
+        // エラー情報の安全な取得（undefined対策）
+        const errorMessage = 
+          (result?.error || result?.message || '会員登録中にエラーが発生しました');
+        const errorDetails = 
+          (result?.details || result?.error || result?.message || '詳細なし');
+        
+        console.error('[認証] 会員登録APIエラー詳細:', {
+          errorMessage,
+          errorDetails
+        });
+        
+        // ステータスコードに基づいたエラーメッセージの生成
+        let displayError = errorMessage;
+        if (response.status === 400) {
+          if (
+            typeof errorMessage === 'string' && 
+            (errorMessage.includes('email') || errorMessage.includes('メール'))
+          ) {
+            displayError = 'このメールアドレスは既に使用されているか、無効な形式です';
+          } else if (
+            typeof errorMessage === 'string' && 
+            (errorMessage.includes('password') || errorMessage.includes('パスワード'))
+          ) {
+            displayError = 'パスワードは8文字以上必要です';
+          }
+        } else if (response.status === 404) {
+          displayError = 'APIエンドポイントが見つかりません';
+        } else if (response.status >= 500) {
+          displayError = 'サーバーエラーが発生しました。しばらく経ってからもう一度お試しください';
         }
         
-        console.log('会員登録成功:', authData?.user?.id);
-        setSuccess('会員登録が完了しました。メールを確認してアカウントを有効化してください。');
-        setMode('login');
-        registerForm.reset();
-      } catch (signUpError: any) {
-        console.error('登録エラー詳細:', signUpError, typeof signUpError, Object.keys(signUpError));
-        throw new Error(`登録エラー: ${signUpError.message || '不明なエラー'}`);
+        setError(displayError);
+        return;
       }
+
+      console.log('[認証] 会員登録成功:', { 
+        userId: result.user?.id,
+        sessionExpires: result.session?.expires_at 
+      });
+      setSuccess('会員登録が完了しました。メールを確認してアカウントを有効化してください。');
+      
+      // 成功時のコールバックがあれば実行
+      if (onSuccess) {
+        setTimeout(() => {
+          onSuccess();
+        }, 2000);
+      }
+      
+      setMode('login');
+      registerForm.reset();
     } catch (error: any) {
-      console.error('エラー発生:', error, typeof error, Object.keys(error));
-      setError(error.message || 'エラーが発生しました。もう一度お試しください。');
+      // ネットワークエラーの詳細ログ（通常はFailed to fetchなど）
+      console.error('[認証] 会員登録実行エラー:', {
+        error,
+        message: error?.message,
+        type: typeof error,
+        stack: error?.stack,
+        properties: Object.keys(error || {})
+      });
+      
+      // ネットワークエラーの場合はユーザーフレンドリーなメッセージを表示
+      if (error?.message === 'Failed to fetch') {
+        setError('サーバーに接続できません。インターネット接続を確認するか、しばらく経ってからもう一度お試しください');
+      } else {
+        setError(error?.message || '会員登録中に予期しないエラーが発生しました');
+      }
     } finally {
       setLoading(false);
     }
@@ -192,7 +342,13 @@ export default function AuthForm() {
 
       {error && (
         <div className="error-message">
-          {error}
+          <i className="fas fa-exclamation-circle"></i>
+          <span>{error}</span>
+          {retryCountdown && (
+            <div className="retry-countdown">
+              再試行まで: {retryCountdown}秒
+            </div>
+          )}
         </div>
       )}
 
