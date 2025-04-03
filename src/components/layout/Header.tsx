@@ -307,6 +307,7 @@ export default function Header() {
         navLinks={[
           { href: '/', label: 'ホーム' },
           { href: '/#story', label: 'ストーリー' },
+          { href: '/news', label: 'ニュース' },
           { href: '/lesson', label: 'レッスン' },
           { href: '/teacher', label: '講師紹介' },
           { href: '/access', label: 'アクセス' },

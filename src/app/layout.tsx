@@ -2,16 +2,23 @@ import type { Metadata } from "next";
 import { Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
 import "./globals.css";
 import { Providers } from './providers';
+import Script from 'next/script';
 
+// フォントの最適化: 必要なサブセットのみ読み込み、display指定でレンダリング方法を最適化
 const notoSans = Noto_Sans_JP({
   variable: "--font-noto-sans",
-  weight: ['300', '400', '500', '700'],
+  weight: ['400', '700'], // 必要な太さのみ指定して軽量化
   subsets: ["latin"],
+  display: 'swap', // テキストをすぐに表示し、フォントは後から適用
+  preload: true,
 });
 
 const notoSerif = Noto_Serif_JP({
   variable: "--font-noto-serif",
-  weight: ['300', '400', '500'],
+  weight: ['400', '500'],
+  display: 'swap',
+  preload: true,
+  fallback: ['serif'], // フォールバックフォントを指定
 });
 
 export const metadata: Metadata = {
@@ -49,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja">
+    <html lang="ja" className={`${notoSans.variable} ${notoSerif.variable}`}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
@@ -60,14 +67,21 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+        {/* Font Awesome を遅延読み込みに変更 */}
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
       </head>
-      <body
-        className={`${notoSans.variable} ${notoSerif.variable} antialiased`}
-      >
+      <body className="antialiased">
         <Providers>
           {children}
         </Providers>
+        {/* Font Awesome を遅延読み込み */}
+        <Script
+          src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"
+          integrity="sha512-GWzVrcGlo0TxTRvz9ttioyYJ+Wwk9Ck0G81D+eO63BaqHaJ3YZX9wuqjwgfcV/MrB2PhaVX9DkYVhbFpStnqpQ=="
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

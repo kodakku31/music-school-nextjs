@@ -86,33 +86,33 @@ export default function TeacherPage() {
     {
       id: 3,
       name: '佐藤 美咲',
-      role: 'ボーカル講師',
-      profile: '洗足学園音楽大学声楽科卒業。様々なジャンルの歌唱法に精通し、発声から表現力まで総合的に指導。プロのボーカリストとしても活躍中。',
+      role: 'チェロ講師',
+      profile: '国立音楽大学チェロ科卒業。ヨーロッパでの研修経験を持ち、オーケストラでの演奏活動も行う。温かく丁寧な指導で初心者にも安心。',
       education: [
-        '洗足学園音楽大学声楽科卒業',
-        'ニューヨーク・ボーカルアカデミー修了'
+        '国立音楽大学チェロ科卒業',
+        'プラハ音楽アカデミー研修'
       ],
       awards: [
-        '日本ジャズボーカルコンテスト優勝（2019年）',
-        'アジアシンガーコンペティション入賞（2017年）'
+        '日本クラシック音楽コンクール入賞（2019年）',
+        '国際チェロコンクール特別賞（2017年）'
       ],
       experience: '指導歴：8年',
-      speciality: '専門：ポップスボーカル、ジャズボーカル、声楽',
-      courses: ['ボーカル入門コース', 'ボーカル基礎コース', 'ボーカル専門コース', 'ジャズボーカルコース'],
-      schedule: '月・水・木 16:00〜21:00、土・日 11:00〜19:00',
+      speciality: '専門：クラシックチェロ、室内楽',
+      courses: ['チェロ入門コース', 'チェロ基礎コース', 'チェロ専門コース', 'アンサンブルコース'],
+      schedule: '月・水・土 13:00〜20:00、日 10:00〜17:00',
       skills: {
-        classical: 70,
-        jazz: 95,
-        pop: 90,
-        teaching: 85,
-        theory: 75
+        classical: 90,
+        jazz: 70,
+        pop: 75,
+        teaching: 95,
+        theory: 85
       },
-      message: '歌は自分自身を表現する素晴らしい手段です。正しい発声法を身につけて、あなたの声の可能性を広げましょう。',
-      longBio: '幼少期から合唱団で歌い、高校時代にジャズに魅了される。洗足学園音楽大学声楽科卒業後、ニューヨークに渡り、様々なスタイルの歌唱法を学ぶ。帰国後はジャズクラブやコンサートホールでの演奏活動を行いながら、ボーカル指導者としてのキャリアをスタート。クラシックの発声法をベースに、ジャズやポップスなど様々なジャンルに対応した指導を行っている。特に表現力と個性を引き出す指導には定評があり、プロを目指す生徒も多数指導している。',
+      message: 'チェロの豊かな音色と表現力を一緒に探求しましょう。音楽を通じて感性を磨き、心を豊かにする時間を大切にしています。',
+      longBio: '5歳からチェロを始め、国立音楽大学を首席で卒業後、プラハで研鑽を積む。帰国後は国内オーケストラでの演奏活動と並行して後進の指導にあたる。特に初心者への指導に定評があり、楽器の持ち方から音色作りまで丁寧に指導。チェロの魅力を伝えることに情熱を持ち、生徒一人ひとりの個性を大切にした指導を心がけている。',
       performances: [
-        'ブルーノート東京 ライブ（2024年）',
-        '全国ジャズフェスティバル出演（2023年）',
-        'アルバム「Voice of Heart」リリース（2022年）'
+        'N響定期演奏会出演（2022年）',
+        '室内楽リサイタル（2021年）',
+        '国際音楽祭出演（2020年）'
       ],
       image: '/images/teacher3.jpg',
       gallery: [
@@ -121,45 +121,6 @@ export default function TeacherPage() {
         '/images/teacher3-gallery3.jpg'
       ],
       slug: 'sato-misaki'
-    },
-    {
-      id: 4,
-      name: '田中 誠',
-      role: 'ギター講師',
-      profile: '国内外のギターコンクールで入賞経験あり。クラシックからポップス、ジャズまで幅広いジャンルを演奏。初心者にも分かりやすい指導が特徴。',
-      education: [
-        '東京芸術大学音楽学部器楽科卒業',
-        'スペイン・マドリッド王立音楽院留学'
-      ],
-      awards: [
-        '日本ギターコンクール優勝（2017年）',
-        'アジアギターフェスティバル金賞（2015年）'
-      ],
-      experience: '指導歴：12年',
-      speciality: '専門：クラシックギター、アコースティックギター、エレキギター',
-      courses: ['ギター入門コース', 'ギター基礎コース', 'ギター専門コース', 'バンド演奏コース'],
-      schedule: '火・木・金 15:00〜21:00、土 10:00〜17:00',
-      skills: {
-        classical: 90,
-        jazz: 85,
-        pop: 95,
-        teaching: 90,
-        theory: 80
-      },
-      message: 'ギターは一生の友達になる楽器です。初心者の方も経験者の方も、それぞれのペースで楽しく上達できるようサポートします。',
-      longBio: '10歳でギターを始め、クラシックギターからロック、ジャズまで幅広いジャンルを学ぶ。東京芸術大学卒業後、スペインに留学しフラメンコギターも習得。帰国後はソロ活動やバンド活動を行いながら、後進の指導にあたる。初心者からプロ志望の生徒まで、一人ひとりの目標に合わせた指導を行っている。特に、楽しみながら上達できる独自のメソッドには定評があり、挫折せずに続けられる指導を心がけている。また、作曲や編曲の指導も行い、創造性を育む教育にも力を入れている。',
-      performances: [
-        '全国ギターフェスティバル出演（2023年）',
-        'ソロアルバム「Strings of Heart」リリース（2022年）',
-        '日本ツアー「Guitar Journey」（2021年）'
-      ],
-      image: '/images/teacher4.jpg',
-      gallery: [
-        '/images/teacher4-gallery1.jpg',
-        '/images/teacher4-gallery2.jpg',
-        '/images/teacher4-gallery3.jpg'
-      ],
-      slug: 'tanaka-makoto'
     }
   ];
 
@@ -188,14 +149,10 @@ export default function TeacherPage() {
                     <Image 
                       src={teacher.image} 
                       alt={teacher.name}
-                      width={300}
-                      height={400}
+                      width={800}
+                      height={450}
                       style={{ objectFit: 'cover' }}
                     />
-                    <div className="teacher-quick-info">
-                      <div className="teacher-name">{teacher.name}</div>
-                      <div className="teacher-role">{teacher.role}</div>
-                    </div>
                   </div>
                   
                   <div className="teacher-content">
@@ -210,97 +167,14 @@ export default function TeacherPage() {
                     
                     <div className="teacher-details">
                       <div className="detail-item">
-                        <h4>経歴</h4>
-                        <ul>
-                          {teacher.education.map((edu, index) => (
-                            <li key={index}>{edu}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      
-                      <div className="detail-item">
-                        <h4>受賞歴</h4>
-                        <ul>
-                          {teacher.awards.map((award, index) => (
-                            <li key={index}>{award}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      
-                      <div className="detail-item">
-                        <h4>専門分野</h4>
-                        <p>{teacher.speciality}</p>
-                      </div>
-                      
-                      <div className="detail-item">
-                        <h4>担当コース</h4>
-                        <div className="course-tags">
-                          {teacher.courses.map((course, index) => (
-                            <span key={index} className="course-tag">{course}</span>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="detail-item">
                         <h4>レッスン可能時間</h4>
                         <p>{teacher.schedule}</p>
                       </div>
-                    </div>
-                    
-                    <div className="teacher-skills">
-                      <h4>スキルレベル</h4>
-                      <div className="skill-bars">
-                        <div className="skill-bar">
-                          <div className="skill-name">クラシック</div>
-                          <div className="skill-level">
-                            <div className="skill-fill" style={{ width: `${teacher.skills.classical}%` }}></div>
-                          </div>
-                          <div className="skill-percent">{teacher.skills.classical}%</div>
-                        </div>
-                        <div className="skill-bar">
-                          <div className="skill-name">ジャズ</div>
-                          <div className="skill-level">
-                            <div className="skill-fill" style={{ width: `${teacher.skills.jazz}%` }}></div>
-                          </div>
-                          <div className="skill-percent">{teacher.skills.jazz}%</div>
-                        </div>
-                        <div className="skill-bar">
-                          <div className="skill-name">ポップス</div>
-                          <div className="skill-level">
-                            <div className="skill-fill" style={{ width: `${teacher.skills.pop}%` }}></div>
-                          </div>
-                          <div className="skill-percent">{teacher.skills.pop}%</div>
-                        </div>
-                        <div className="skill-bar">
-                          <div className="skill-name">指導力</div>
-                          <div className="skill-level">
-                            <div className="skill-fill" style={{ width: `${teacher.skills.teaching}%` }}></div>
-                          </div>
-                          <div className="skill-percent">{teacher.skills.teaching}%</div>
-                        </div>
-                        <div className="skill-bar">
-                          <div className="skill-name">音楽理論</div>
-                          <div className="skill-level">
-                            <div className="skill-fill" style={{ width: `${teacher.skills.theory}%` }}></div>
-                          </div>
-                          <div className="skill-percent">{teacher.skills.theory}%</div>
-                        </div>
+                      
+                      <div className="detail-item">
+                        <h4>メッセージ</h4>
+                        <p>{teacher.message}</p>
                       </div>
-                    </div>
-                    
-                    <div className="teacher-message">
-                      <h4>メッセージ</h4>
-                      <p>{teacher.message}</p>
-                    </div>
-                    
-                    <div className="teacher-actions">
-                      <Link 
-                        href={`/teacher/${teacher.slug}`} 
-                        className="btn btn-primary"
-                      >
-                        詳細プロフィール
-                      </Link>
-                      <a href="#" className="btn btn-secondary">レッスン予約</a>
                     </div>
                   </div>
                 </article>

@@ -1,7 +1,36 @@
 import MainLayout from "@/components/layout/MainLayout";
 import Image from "next/image";
+import ImageSlider from "@/components/ui/ImageSlider";
 
 export default function AccessPage() {
+  // 施設写真データ
+  const facilityImages = [
+    {
+      src: "/images/facility/studio1.jpg",
+      alt: "スタジオA（ピアノ・声楽）",
+      caption: "スタジオA（ピアノ・声楽）",
+      blurDataURL: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQIGAwAAAAAAAAAAAAABAgMABAUGERIhQVFhcf/EABUBAQEAAAAAAAAAAAAAAAAAAAAB/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AnnGMbYjjMVvbxXF3cNvkVmCIgHWTsk9e+KCaf5P0UpQH/9k="
+    },
+    {
+      src: "/images/facility/studio2.jpg",
+      alt: "スタジオB（弦楽器・管楽器）",
+      caption: "スタジオB（弦楽器・管楽器）",
+      blurDataURL: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQIGAwAAAAAAAAAAAAABAgMABAUGERIhQVFhcf/EABUBAQEAAAAAAAAAAAAAAAAAAAAB/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AnnGMbYjjMVvbxXF3cNvkVmCIgHWTsk9e+KCaf5P0UpQH/9k="
+    },
+    {
+      src: "/images/facility/lounge.jpg",
+      alt: "待合スペース",
+      caption: "待合スペース",
+      blurDataURL: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQIGAwAAAAAAAAAAAAABAgMABAUGERIhQVFhcf/EABUBAQEAAAAAAAAAAAAAAAAAAAAB/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AnnGMbYjjMVvbxXF3cNvkVmCIgHWTsk9e+KCaf5P0UpQH/9k="
+    },
+    {
+      src: "/images/facility/classroom.jpg",
+      alt: "レッスンルーム",
+      caption: "レッスンルーム",
+      blurDataURL: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQIGAwAAAAAAAAAAAAABAgMABAUGERIhQVFhcf/EABUBAQEAAAAAAAAAAAAAAAAAAAAB/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AnnGMbYjjMVvbxXF3cNvkVmCIgHWTsk9e+KCaf5P0UpQH/9k="
+    }
+  ];
+
   return (
     <MainLayout>
       <div className="content-sections">
@@ -76,56 +105,13 @@ export default function AccessPage() {
             
             <div className="access-gallery">
               <h3>施設写真</h3>
-              <div className="gallery-items">
-                <div className="gallery-item">
-                  <div className="gallery-image">
-                    <Image 
-                      src="/images/facility1.jpg" 
-                      alt="スタジオ内観" 
-                      width={400}
-                      height={300}
-                      style={{ objectFit: 'cover' }}
-                    />
-                  </div>
-                  <p className="caption">スタジオA（ピアノ・声楽）</p>
-                </div>
-                <div className="gallery-item">
-                  <div className="gallery-image">
-                    <Image 
-                      src="/images/facility2.jpg" 
-                      alt="スタジオ内観" 
-                      width={400}
-                      height={300}
-                      style={{ objectFit: 'cover' }}
-                    />
-                  </div>
-                  <p className="caption">スタジオB（弦楽器・管楽器）</p>
-                </div>
-                <div className="gallery-item">
-                  <div className="gallery-image">
-                    <Image 
-                      src="/images/facility3.jpg" 
-                      alt="待合スペース" 
-                      width={400}
-                      height={300}
-                      style={{ objectFit: 'cover' }}
-                    />
-                  </div>
-                  <p className="caption">待合スペース</p>
-                </div>
-                <div className="gallery-item">
-                  <div className="gallery-image">
-                    <Image 
-                      src="/images/facility4.jpg" 
-                      alt="レッスンルーム" 
-                      width={400}
-                      height={300}
-                      style={{ objectFit: 'cover' }}
-                    />
-                  </div>
-                  <p className="caption">レッスンルーム</p>
-                </div>
-              </div>
+              <ImageSlider 
+                images={facilityImages} 
+                autoPlay={true}
+                interval={6000}
+                showControls={true}
+                showDots={true}
+              />
             </div>
           </div>
         </section>

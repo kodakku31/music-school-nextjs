@@ -44,46 +44,6 @@ export default function LessonPage() {
       teachers: ['鈴木 一郎', '田中 誠'],
       image: '/images/violin.jpg',
       courseImage: '/images/course-violin.jpg',
-    },
-    {
-      id: 3,
-      title: 'ボーカルレッスン',
-      description: '発声法から呼吸法、表現力まで総合的に学べるボーカルレッスンです。ポップス、ジャズ、クラシックなど様々なジャンルに対応しています。',
-      features: [
-        '正しい呼吸法と発声法',
-        'ピッチとリズムの訓練',
-        '表現力と感情表現の向上',
-        'マイクパフォーマンス技術',
-      ],
-      plans: [
-        { name: '入門コース', frequency: '月2回', duration: '30分/回', price: '8,500円/月' },
-        { name: '基礎コース', frequency: '週1回', duration: '45分/回', price: '13,000円/月' },
-        { name: '専門コース', frequency: '週1回', duration: '60分/回', price: '17,000円/月' },
-      ],
-      schedule: '月・水・木 16:00〜21:00、土・日 11:00〜19:00',
-      teachers: ['佐藤 美咲', '山田 花子'],
-      image: '/images/vocal.jpg',
-      courseImage: '/images/course-vocal.jpg',
-    },
-    {
-      id: 4,
-      title: 'ギターレッスン',
-      description: 'アコースティックギター、エレキギター、クラシックギターなど、様々なスタイルに対応したレッスンを提供しています。',
-      features: [
-        'コード進行とストロークパターン',
-        'フィンガーピッキング技術',
-        'スケールとソロ演奏の基礎',
-        '様々な音楽ジャンルの演奏スタイル',
-      ],
-      plans: [
-        { name: '入門コース', frequency: '月2回', duration: '30分/回', price: '7,500円/月' },
-        { name: '基礎コース', frequency: '週1回', duration: '45分/回', price: '11,000円/月' },
-        { name: '専門コース', frequency: '週1回', duration: '60分/回', price: '15,000円/月' },
-      ],
-      schedule: '火・木・金 15:00〜21:00、土 10:00〜17:00',
-      teachers: ['田中 誠', '鈴木 一郎'],
-      image: '/images/guitar.jpg',
-      courseImage: '/images/course-guitar.jpg',
     }
   ];
 
@@ -114,8 +74,8 @@ export default function LessonPage() {
                     <Image 
                       src={lesson.image} 
                       alt={lesson.title}
-                      width={400}
-                      height={300}
+                      width={800}
+                      height={450}
                       style={{ objectFit: 'cover' }}
                     />
                   </div>
@@ -152,16 +112,6 @@ export default function LessonPage() {
                     <div className="lesson-schedule">
                       <h4>レッスン可能時間</h4>
                       <p>{lesson.schedule}</p>
-                    </div>
-                    
-                    <div className="lesson-teachers">
-                      <h4>担当講師</h4>
-                      <p>{lesson.teachers.join('、')}</p>
-                    </div>
-                    
-                    <div className="lesson-actions">
-                      <a href="#trial-form" className="btn btn-primary">体験レッスンを申し込む</a>
-                      <Link href="/teacher" className="btn btn-secondary">講師紹介を見る</Link>
                     </div>
                   </div>
                 </article>

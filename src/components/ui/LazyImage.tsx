@@ -11,6 +11,10 @@ type LazyImageProps = {
   className?: string;
   priority?: boolean;
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  quality?: number;
+  sizes?: string;
+  placeholder?: 'blur' | 'empty';
+  blurDataURL?: string;
 };
 
 /**
@@ -18,6 +22,8 @@ type LazyImageProps = {
  * - 遅延読み込み
  * - ぼかしプレースホルダー
  * - メモ化による再レンダリング防止
+ * - 画質調整
+ * - レスポンシブサイズ対応
  */
 function LazyImageComponent({
   src,
@@ -27,6 +33,10 @@ function LazyImageComponent({
   className = '',
   priority = false,
   objectFit = 'cover',
+  quality = 75,
+  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+  placeholder = 'empty',
+  blurDataURL,
 }: LazyImageProps) {
   const [isLoading, setIsLoading] = useState(!priority);
 
@@ -34,6 +44,9 @@ function LazyImageComponent({
   const handleImageLoad = () => {
     setIsLoading(false);
   };
+
+  // 低品質のプレースホルダー画像URL
+  const defaultBlurDataURL = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNmMmYyZjIiLz48L3N2Zz4=';
 
   return (
     <div
@@ -56,6 +69,10 @@ function LazyImageComponent({
         className={`transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
         style={{ objectFit }}
         loading={priority ? 'eager' : 'lazy'}
+        quality={quality}
+        sizes={sizes}
+        placeholder={placeholder}
+        blurDataURL={blurDataURL || defaultBlurDataURL}
       />
     </div>
   );
