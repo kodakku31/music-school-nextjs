@@ -9,10 +9,16 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const path = req.nextUrl.pathname;
   
+  // 開発環境やプレビュー環境かどうかを確認
+  const isDevOrPreview = process.env.NODE_ENV === 'development' || 
+                         req.headers.get('x-vercel-deployment-url')?.includes('vercel.app') ||
+                         req.headers.get('host')?.includes('localhost');
+  
   // 認証が必要なパスの場合のみSupabase認証チェックを実行
   const isAuthRequired = authRequiredPaths.some(authPath => path.startsWith(authPath));
   
-  if (isAuthRequired) {
+  // 開発環境やプレビュー環境では認証チェックをスキップ
+  if (isAuthRequired && !isDevOrPreview) {
     try {
       // ミドルウェアでSupabaseクライアントを作成
       const supabase = createMiddlewareClient({ req, res });
@@ -34,7 +40,7 @@ export async function middleware(req: NextRequest) {
     }
   }
   
-  // 認証が不要なパスの場合は何もせずに次へ
+  // 認証が不要なパスまたは開発環境/プレビュー環境の場合は何もせずに次へ
   return res;
 }
 

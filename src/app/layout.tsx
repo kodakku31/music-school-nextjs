@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
 import "./globals.css";
 import { Providers } from './providers';
@@ -21,18 +21,15 @@ const notoSerif = Noto_Serif_JP({
   fallback: ['serif'], // フォールバックフォントを指定
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "音楽教室 | Music School",
   description: "音楽を愛する全ての人のための音楽教室",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-  },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#222222" },
-  ],
   icons: {
     icon: [
       {
@@ -50,16 +47,16 @@ export const metadata: Metadata = {
   },
 };
 
+// themeColorをCSSカスタムプロパティとして設定
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="ja" className={`${notoSans.variable} ${notoSerif.variable}`}>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <meta name="theme-color" content="#000000" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -69,6 +66,26 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         {/* Font Awesome を遅延読み込みに変更 */}
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+        <style>
+          {`:root {
+            --theme-color-light: #ffffff;
+            --theme-color-dark: #222222;
+          }
+          @media (prefers-color-scheme: light) {
+            :root {
+              --theme-color: var(--theme-color-light);
+            }
+          }
+          @media (prefers-color-scheme: dark) {
+            :root {
+              --theme-color: var(--theme-color-dark);
+            }
+          }
+          body {
+            background-color: var(--theme-color);
+          }
+          `}
+        </style>
       </head>
       <body className="antialiased">
         <Providers>

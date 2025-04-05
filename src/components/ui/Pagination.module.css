@@ -1,0 +1,53 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  gap: 0.5rem;
+}
+
+.pageButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: var(--color-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+}
+
+.pageButton:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.pageButton.active {
+  background-color: #000;
+  color: #fff;
+}
+
+.navButton {
+  font-size: 1rem;
+}
+
+.navButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  .pagination {
+    gap: 0.25rem;
+  }
+  
+  .pageButton {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+  }
+}

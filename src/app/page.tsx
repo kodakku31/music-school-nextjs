@@ -24,23 +24,26 @@ export default function Home() {
         {/* ストーリーセクション */}
         <section id="story" className="content-section">
           <div className="section-inner">
-            <h2 className="section-title">私たちのストーリー</h2>
             
             <div className="story-container">
-              <div className="story-image-main">
-                <Image 
-                  src="/images/story/piano-passion.jpg" 
-                  alt="ピアノを弾く手のクローズアップ" 
-                  width={800} 
-                  height={533}
-                  className="rounded-lg shadow-lg"
-                />
-              </div>
-              
               <div className="story-text">
-                <h3 className="story-subtitle">音楽の喜びを伝えたい</h3>
+                <h3 className="story-subtitle">音楽の喜びを一生の宝物に</h3>
                 <p>
-                  私たちの音楽教室は、2010年に創設者の佐藤美和子が「音楽の喜びをもっと多くの人に」という思いから始まりました。プロのピアニストとして活動する中で、技術だけを教える従来の教育に疑問を感じ、<strong>音楽を楽しむ心</strong>を大切にした教室を作りたいと考えたのです。
+                  音楽スペースHoihoiでは、「ピアノを弾く技術」だけでなく「音楽を心から楽しむ力」を育てます。ゆみ先生が大切にしているのは、お子さまが「ピアノが好き」という気持ちを持ち続けられる環境づくり。幼い頃に「練習しなさい」と言われて仕方なく取り組む経験が、後に「ピアノ嫌い」につながることをご存知ですか？
+                </p>
+                
+                <div className="story-image-main">
+                  <Image 
+                    src="/images/story/piano-passion.jpg" 
+                    alt="ピアノを弾く手のクローズアップ" 
+                    width={800} 
+                    height={533}
+                    className="rounded-lg shadow-lg"
+                  />
+                </div>
+                
+                <p>
+                  当教室では、基礎をしっかり身につける「受け身のレッスン」と、「弾きたい曲」に挑戦する「主体的なレッスン」をバランスよく組み合わせています。お子さまが「この曲をこんな風に弾きたい！」と思った時こそ、自ら練習に向かう最高の瞬間です。
                 </p>
                 
                 <div className="story-image-side">
@@ -54,12 +57,7 @@ export default function Home() {
                 </div>
                 
                 <p>
-                  当教室では、一人ひとりの個性や目標に合わせたカリキュラムを提供しています。初心者の方には基礎からじっくりと、経験者の方にはさらなる技術向上と表現力を磨くレッスンを行っています。何より大切にしているのは、<strong>音楽を通じた自己表現の喜び</strong>を感じていただくことです。
-                </p>
-                
-                <h3 className="story-subtitle">音楽は人生を豊かにする</h3>
-                <p>
-                  ピアノを弾くことは、単に指を動かす技術ではありません。感情を表現し、物語を紡ぎ、時には自分自身と向き合う時間でもあります。私たちは生徒さん一人ひとりが、音楽を通じて<strong>心の豊かさ</strong>を育み、人生の喜びや悲しみをより深く感じられるようになることを願っています。
+                  楽譜が読めるようになる速さも、指の上達も、それぞれのお子さまで異なります。比較するのではなく、その子自身の変化に目を向け、温かく見守ることが大切です。まずは音楽を「聴く耳」と「感じる心」を育て、それから読譜力や技術を高めていく—この順序が、生涯にわたって音楽を楽しめる秘訣です。
                 </p>
                 
                 <div className="story-image-side right">
@@ -73,7 +71,7 @@ export default function Home() {
                 </div>
                 
                 <p>
-                  講師陣は、国内外の音楽大学を卒業した演奏家や教育者で構成されています。技術指導はもちろん、音楽の歴史や理論、そして何より<strong>音楽を愛する心</strong>を伝えることを大切にしています。年齢や経験を問わず、音楽を通じて新たな自分と出会える場所—それが私たちの教室です。
+                  ピアノを通じて、お子さまの中に眠る音楽の才能と感性を一緒に育んでいきませんか？音楽スペースHoihoiは、お子さま一人ひとりの個性と成長を大切にする教室です。
                 </p>
               </div>
             </div>

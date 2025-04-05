@@ -12,6 +12,24 @@ const nextConfig: NextConfig = withPWA({
     domains: ['source.unsplash.com', 'picsum.photos', 'qienwjmatpqhirlibvws.supabase.co'],
     unoptimized: true,
   },
+  // Turbopackの設定
+  experimental: {
+    turbo: {
+      rules: {
+        // Turbopackのルール設定
+      },
+    },
+  },
+  // 開発オリジンの許可設定
+  allowedDevOrigins: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
+    'http://localhost:3004',
+    'http://localhost:3005',
+    'http://127.0.0.1:*',
+  ],
   async headers() {
     return [
       {
@@ -49,6 +67,11 @@ const nextConfig: NextConfig = withPWA({
       {
         source: '/api/supabase/:path*',
         destination: 'https://qienwjmatpqhirlibvws.supabase.co/:path*',
+      },
+      // ログインページのリダイレクト
+      {
+        source: '/login',
+        destination: '/auth/login',
       },
     ];
   },
